@@ -1,0 +1,92 @@
+{% extends 'dashboard/dashboard_base.html' %}
+
+{% block title %}Admin Dashboard - WMRS{% endblock %}
+{% block header %}System Overview{% endblock %}
+
+{% block dashboard_content %}
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="card stats-card h-100 p-3">
+            <div class="text-muted small">Total Customers</div>
+            <div class="d-flex align-items-center">
+                <h2 class="mb-0">{{ total_customers }}</h2>
+                <div class="ms-auto text-success"><i class="bi bi-people fs-3"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stats-card h-100 p-3">
+            <div class="text-muted small">Pending Requests</div>
+            <div class="d-flex align-items-center">
+                <h2 class="mb-0">{{ pending_requests }}</h2>
+                <div class="ms-auto text-warning"><i class="bi bi-clock-history fs-3"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stats-card h-100 p-3">
+            <div class="text-muted small">Total Revenue</div>
+            <div class="d-flex align-items-center">
+                <h2 class="mb-0">RWF {{ total_revenue }}</h2>
+                <div class="ms-auto text-primary"><i class="bi bi-cash-stack fs-3"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stats-card h-100 p-3">
+            <div class="text-muted small">Pending Complaints</div>
+            <div class="d-flex align-items-center">
+                <h2 class="mb-0">{{ pending_complaints }}</h2>
+                <div class="ms-auto text-danger"><i class="bi bi-exclamation-triangle fs-3"></i></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card p-4 h-100">
+            <h5 class="mb-4">Monthly Collection Performance</h5>
+            <canvas id="performanceChart" height="250"></canvas>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="card p-4 h-100">
+            <h5 class="mb-4">Waste Distribution</h5>
+            <canvas id="wasteChart" height="250"></canvas>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Placeholder charts
+    const ctx1 = document.getElementById('performanceChart').getContext('2d');
+    new Chart(ctx1, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            datasets: [{
+                label: 'Collections',
+                data: [12, 19, 3, 5, 2, 3],
+                borderColor: '#2d6a4f',
+                tension: 0.1
+            }]
+        }
+    });
+
+    const ctx2 = document.getElementById('wasteChart').getContext('2d');
+    new Chart(ctx2, {
+        type: 'doughnut',
+        data: {
+            labels: ['Plastic', 'Paper', 'Organic', 'Glass'],
+            datasets: [{
+                data: [30, 20, 40, 10],
+                backgroundColor: ['#2d6a4f', '#40916c', '#95d5b2', '#1b4332']
+            }]
+        }
+    });
+</script>
+{% endblock %}

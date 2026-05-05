@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Our Services - WMRS{% endblock %}
+
+{% block content %}
+<div class="bg-light py-5">
+    <div class="container text-center">
+        <h2 class="fw-bold">Professional Waste Solutions</h2>
+        <p class="lead text-muted">Tailored services for every need.</p>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="row g-4">
+        {% for service in services %}
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm">
+                {% if service.image %}
+                <img src="{{ service.image.url }}" class="card-img-top" alt="{{ service.title }}">
+                {% else %}
+                <div class="bg-success text-white py-5 text-center">
+                    <i class="bi bi-gear display-4"></i>
+                </div>
+                {% endif %}
+                <div class="card-body">
+                    <h5 class="card-title fw-bold">{{ service.title }}</h5>
+                    <p class="card-text text-muted">{{ service.description }}</p>
+                    <p class="h5 text-success">Starting from RWF {{ service.price }}</p>
+                </div>
+                <div class="card-footer bg-white border-0 pb-4">
+                    <a href="{% url 'accounts:register' %}" class="btn btn-outline-success w-100">Get Started</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center">
+            <p>No services listed at the moment. Please contact us for inquiries.</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

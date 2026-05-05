@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<section class="hero-section">
+    <div class="container">
+        <h1 class="display-3 fw-bold">Clean Environment, <br> Green Future.</h1>
+        <p class="lead mb-4">Professional waste collection and recycling services in Rwanda.</p>
+        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+            <a href="{% url 'accounts:register' %}" class="btn btn-primary btn-lg px-4 gap-3">Get Started</a>
+            <a href="{% url 'core:services' %}" class="btn btn-outline-light btn-lg px-4">Our Services</a>
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row text-center mb-5">
+            <div class="col">
+                <h2 class="fw-bold">Why Choose Us?</h2>
+                <p class="text-muted">We provide reliable and eco-friendly waste management solutions.</p>
+            </div>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm p-4 text-center">
+                    <div class="display-4 text-success mb-3"><i class="bi bi-truck"></i></div>
+                    <h3>Reliable Pickup</h3>
+                    <p class="text-muted">Punctual and scheduled waste collection for residential and commercial clients.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm p-4 text-center">
+                    <div class="display-4 text-success mb-3"><i class="bi bi-recycle"></i></div>
+                    <h3>Eco-Recycling</h3>
+                    <p class="text-muted">We sort and process waste to minimize landfill impact and promote reuse.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm p-4 text-center">
+                    <div class="display-4 text-success mb-3"><i class="bi bi-shield-check"></i></div>
+                    <h3>Professional Staff</h3>
+                    <p class="text-muted">Our trained drivers and sorting staff ensure hygiene and safety at every step.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="bg-light py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <img src="https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&q=80&w=2070" class="img-fluid rounded shadow" alt="Waste Management">
+            </div>
+            <div class="col-lg-6">
+                <h2 class="fw-bold mb-4">Our Commitment to Rwanda</h2>
+                <p>At WMRS, we are more than just a waste collection company. We are partners in Rwanda's journey towards sustainable development and environmental cleanliness.</p>
+                <ul class="list-unstyled">
+                    <li><i class="bi bi-check-circle-fill text-success"></i> Comprehensive waste classification</li>
+                    <li><i class="bi bi-check-circle-fill text-success"></i> Modern fleet of collection trucks</li>
+                    <li><i class="bi bi-check-circle-fill text-success"></i> Transparent reporting and invoicing</li>
+                </ul>
+                <a href="{% url 'core:about' %}" class="btn btn-success">Learn More About Us</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

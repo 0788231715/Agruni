@@ -1,0 +1,125 @@
+{% extends 'dashboard/dashboard_base.html' %}
+
+{% block title %}Customer Dashboard - WMRS{% endblock %}
+{% block header %}Welcome, {{ user.username }}!{% endblock %}
+
+{% block dashboard_content %}
+<div class="row g-4 mb-4">
+    <div class="col-md-12">
+        <div class="card p-4 bg-primary text-white">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h4>Need a waste collection?</h4>
+                    <p>Request a one-time pickup or subscribe to a regular plan.</p>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <a href="{% url 'collection:request_create' %}" class="btn btn-light btn-lg">Request Pickup</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card p-4 mb-4">
+            <h5 class="mb-4">Recent Service Requests</h5>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Service</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for request in my_requests %}
+                        <tr>
+                            <td>#{{ request.id }}</td>
+                            <td>{{ request.service.title }}</td>
+                            <td>{{ request.preferred_date }}</td>
+                            <td>
+                                <span class="badge bg-{% if request.status == 'COMPLETED' %}success{% elif request.status == 'PENDING' %}warning{% else %}info{% endif %}">
+                                    {{ request.get_status_display }}
+                                </span>
+                            </td>
+                            <td><a href="#" class="btn btn-sm btn-outline-primary">Details</a></td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="5" class="text-center text-muted">No requests found.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card p-4">
+            <h5 class="mb-4">Recent Invoices</h5>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Number</th>
+                            <th>Amount</th>
+                            <th>Due Date</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for invoice in my_invoices %}
+                        <tr>
+                            <td>{{ invoice.invoice_number }}</td>
+                            <td>RWF {{ invoice.amount }}</td>
+                            <td>{{ invoice.due_date }}</td>
+                            <td>
+                                <span class="badge bg-{% if invoice.status == 'PAID' %}success{% else %}danger{% endif %}">
+                                    {{ invoice.get_status_display }}
+                                </span>
+                            </td>
+                            <td><a href="#" class="btn btn-sm btn-outline-success">Pay Now</a></td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="5" class="text-center text-muted">No invoices found.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card p-4 mb-4">
+            <h5 class="mb-4">Active Subscriptions</h5>
+            <p class="text-muted">Manage your recurring waste collection plans.</p>
+            <div class="text-center py-4">
+                <i class="bi bi-calendar-check display-4 text-muted"></i>
+                <p class="mt-2">No active subscriptions.</p>
+                <a href="#" class="btn btn-outline-primary btn-sm">Browse Plans</a>
+            </div>
+        </div>
+
+        <div class="card p-4">
+            <h5 class="mb-4">My Complaints</h5>
+            <div class="list-group list-group-flush">
+                {% for complaint in my_complaints %}
+                <div class="list-group-item px-0">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h6 class="mb-1">{{ complaint.subject }}</h6>
+                        <small class="text-muted">{{ complaint.created_at|date:"M d" }}</small>
+                    </div>
+                    <p class="mb-1 small text-truncate">{{ complaint.description }}</p>
+                    <span class="badge rounded-pill bg-info small">{{ complaint.get_status_display }}</span>
+                </div>
+                {% empty %}
+                <p class="text-center text-muted py-3">No complaints submitted.</p>
+                {% endfor %}
+            </div>
+            <a href="#" class="btn btn-sm btn-outline-danger w-100 mt-3">Submit New Complaint</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
