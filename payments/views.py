@@ -42,6 +42,65 @@ class UnpaidInvoiceListView(LoginRequiredMixin, ListView):
         managed_zones = Zone.objects.filter(manager=user)
         return queryset.filter(subscription__zone__in=managed_zones)
 
+class ClientPaymentView(LoginRequiredMixin, CreateView):
+    model = Payment
+    form_class = ClientPaymentForm
+    template_name = "payments/client_payment.html"
+    success_url = reverse_lazy("dashboard:index")
+
+    def get_initial(self):
+        invoice = get_object_or_404(Invoice, id=self.request.GET.get('invoice'), subscription__customer=self.request.user)
+        return {'amount': invoice.amount, 'invoice': invoice}
+
+    def form_valid(self, form):
+        invoice = get_object_or_404(Invoice, id=self.request.GET.get('invoice'))
+        form.instance.invoice = invoice
+        form.instance.collected_by = None # Online payment
+        response = super().form_valid(form)
+        
+        # Update Invoice
+        invoice.status = Invoice.InvoiceStatus.PAID
+        invoice.save()
+
+        # Notify Management
+        targets = User.objects.filter(role__in=["ADMIN", "FINANCE"])
+        for target in targets:
+            Notification.objects.create(
+                user=target,
+                title="Online Payment Received",
+                message=f"Customer {self.request.user.username} paid RWF {form.instance.amount} online."
+            )
+        
+        Notification.objects.create(
+            user=self.request.user,
+            title="Payment Successful",
+            message=f"Your payment of RWF {form.instance.amount} has been received."
+        )
+        return response
+
+class MarkNotificationReadView(LoginRequiredMixin, View):
+    def post(self, request, pk):
+        note = get_object_or_404(Notification, id=pk, user=request.user)
+        note.is_read = True
+        note.save()
+        return JsonResponse({"status": "success"})
+
+class AnnouncePaymentDueView(LoginRequiredMixin, View):
+    def post(self, request):
+        if request.user.role not in ["ADMIN", "LOCATION_MANAGER", "FINANCE"]:
+            return redirect("dashboard:index")
+        
+        # Simple logic to notify all customers with unpaid invoices
+        unpaid_invoices = Invoice.objects.filter(status=Invoice.InvoiceStatus.UNPAID)
+        for inv in unpaid_invoices:
+            Notification.objects.create(
+                user=inv.subscription.customer,
+                title="Payment Due Reminder",
+                message=f"Friendly reminder: Your invoice #{inv.invoice_number} for RWF {inv.amount} is due on {inv.due_date}."
+            )
+        messages.success(request, "Payment reminders sent to all unpaid clients.")
+        return redirect("dashboard:index")
+
 class PaymentCreateView(LoginRequiredMixin, CreateView):
     model = Payment
     form_class = PaymentForm

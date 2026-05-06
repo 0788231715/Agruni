@@ -1,0 +1,26 @@
+{% extends "dashboard/dashboard_base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}Pay Invoice - WMRS{% endblock %}
+{% block header %}Online Payment{% endblock %}
+
+{% block dashboard_content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm p-4">
+            <h5 class="fw-bold mb-4 text-primary"><i class="bi bi-credit-card me-2"></i>Secure Payment</h5>
+            <div class="alert alert-info py-2 small">
+                Confirm your transaction details below.
+            </div>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{ form|crispy }}
+                <div class="d-flex gap-2 justify-content-end mt-4">
+                    <a href="{% url 'dashboard:index' %}" class="btn btn-light px-4">Cancel</a>
+                    <button type="submit" class="btn btn-primary px-5 fw-bold shadow-sm">Confirm Payment</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

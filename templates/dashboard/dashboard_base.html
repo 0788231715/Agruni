@@ -212,14 +212,15 @@
 
         {% elif user.role == 'ADMIN' or user.role == 'GENERAL_MANAGER' %}
             <a class="nav-link {% if 'users' in request.path and 'add' not in request.path %}active{% endif %}" href="{% url 'accounts:user_list' %}"><i class="bi bi-people"></i><span>All Users</span></a>
-            <a class="nav-link" href="/admin/collection/zone/"><i class="bi bi-geo-alt"></i><span>Locations/Zones</span></a>
+            <a class="nav-link {% if 'zones' in request.path %}active{% endif %}" href="{% url 'collection:zone_list' %}"><i class="bi bi-geo-alt"></i><span>Locations/Zones</span></a>
             <a class="nav-link {% if 'financial' in request.path %}active{% endif %}" href="{% url 'dashboard:financial_summary' %}"><i class="bi bi-cash-stack"></i><span>Financial Summary</span></a>
             <a class="nav-link" href="{% url 'reports:financial_report' %}"><i class="bi bi-bar-chart"></i><span>Reports</span></a>
 
         {% elif user.role == 'SECRETARY' %}
             <a class="nav-link {% if 'register-user' in request.path %}active{% endif %}" href="{% url 'accounts:register_user' %}"><i class="bi bi-person-plus"></i><span>Register Customer</span></a>
-            <a class="nav-link" href="{% url 'collection:subscription_create' %}"><i class="bi bi-file-earmark-text"></i><span>Agreements</span></a>
+            <a class="nav-link {% if 'subscriptions/create' in request.path %}active{% endif %}" href="{% url 'collection:subscription_create' %}"><i class="bi bi-file-earmark-text"></i><span>Agreements</span></a>
             <a class="nav-link {% if 'users' in request.path and 'role=CUSTOMER' in request.get_full_path %}active{% endif %}" href="{% url 'accounts:user_list' %}?role=CUSTOMER"><i class="bi bi-card-list"></i><span>Customer List</span></a>
+            <a class="nav-link {% if 'zones' in request.path %}active{% endif %}" href="{% url 'collection:zone_list' %}"><i class="bi bi-geo-alt"></i><span>View Zones</span></a>
 
         {% elif user.role == 'LOCATION_MANAGER' %}
             <a class="nav-link {% if 'users' in request.path %}active{% endif %}" href="{% url 'accounts:user_list' %}?role=COLLECTOR"><i class="bi bi-people"></i><span>My Collectors</span></a>
@@ -288,32 +289,39 @@
 
         <div class="d-flex align-items-center gap-3">
             <div class="dropdown">
-                <button class="btn btn-white bg-white shadow-sm border-0 position-relative p-2" type="button" data-bs-toggle="dropdown">
+                <button class="btn btn-white bg-white shadow-sm border-0 position-relative p-2" type="button" data-bs-toggle="dropdown" id="notificationDropdown">
                     <i class="bi bi-bell fs-5"></i>
-
-                    {% if unread_notifications_count|default:0 > 0 %}
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                            {{ unread_notifications_count }}
-                        </span>
-                    {% endif %}
+                    <span id="unreadCount" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger {% if not user.notifications.filter.is_read=False.exists %}d-none{% endif %}">
+                        {{ user.notifications.filter.is_read=False.count }}
+                    </span>
                 </button>
 
-                <ul class="dropdown-menu dropdown-menu-end shadow border-0 p-0 overflow-hidden" style="min-width:300px;">
-                    <li class="p-3 border-bottom bg-light">
-                        <h6 class="mb-0">Notifications</h6>
+                <ul class="dropdown-menu dropdown-menu-end shadow border-0 p-0 overflow-hidden" style="min-width:320px;">
+                    <li class="p-3 border-bottom bg-light d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0 text-success fw-bold">Notifications</h6>
+                        <button class="btn btn-link p-0 small text-decoration-none" onclick="markAllAsRead()">Mark all as read</button>
                     </li>
 
-                    <div style="max-height:350px; overflow-y:auto;">
+                    <div style="max-height:350px; overflow-y:auto;" id="notificationList">
                         {% for note in user.notifications.all|slice:":10" %}
-                            <li>
-                                <a class="dropdown-item p-3 border-bottom d-flex align-items-start gap-2 {% if not note.is_read %}bg-light-subtle{% endif %}" href="#">
-                                    <i class="bi bi-info-circle text-primary mt-1"></i>
-                                    <div>
-                                        <p class="mb-0 small fw-bold">{{ note.title }}</p>
-                                        <p class="mb-0 small text-muted">{{ note.message }}</p>
-                                        <small class="text-muted">{{ note.created_at|timesince }} ago</small>
+                            <li class="notification-item" id="note-{{ note.id }}">
+                                <div class="dropdown-item p-3 border-bottom d-flex align-items-start gap-2 {% if not note.is_read %}bg-light-subtle{% endif %}">
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex justify-content-between">
+                                            <p class="mb-0 small fw-bold">{{ note.title }}</p>
+                                            {% if not note.is_read %}
+                                                <span class="badge bg-primary p-1 rounded-circle" style="width: 8px; height: 8px;"> </span>
+                                            {% endif %}
+                                        </div>
+                                        <p class="mb-0 x-small text-muted">{{ note.message }}</p>
+                                        <div class="d-flex justify-content-between align-items-center mt-1">
+                                            <small class="x-small text-muted">{{ note.created_at|timesince }} ago</small>
+                                            {% if not note.is_read %}
+                                                <button class="btn btn-link p-0 x-small text-decoration-none mark-read-btn" onclick="markRead({{ note.id }}, event)">Mark read</button>
+                                            {% endif %}
+                                        </div>
                                     </div>
-                                </a>
+                                </div>
                             </li>
                         {% empty %}
                             <li class="p-4 text-center text-muted">No new notifications</li>

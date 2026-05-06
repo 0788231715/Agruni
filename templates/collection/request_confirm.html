@@ -1,0 +1,27 @@
+{% extends "dashboard/dashboard_base.html" %}
+
+{% block title %}Confirm Action - WMRS{% endblock %}
+{% block header %}Approve/Reject Request{% endblock %}
+
+{% block dashboard_content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card p-4 shadow-sm border-0 text-center">
+            <h5 class="fw-bold mb-3">Service Request #{{ object.id }}</h5>
+            <p><strong>Customer:</strong> {{ object.customer.username }}</p>
+            <p><strong>Service:</strong> {{ object.service.title }}</p>
+            <p><strong>Proposed Date:</strong> {{ object.preferred_date }}</p>
+            
+            <div class="alert alert-warning mt-3">
+                Are you sure you want to change the status of this request?
+            </div>
+
+            <form method="post" class="d-flex gap-2 justify-content-center mt-4">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success px-4 fw-bold shadow-sm">Confirm Status Change</button>
+                <a href="{% url 'dashboard:index' %}" class="btn btn-light px-4 border">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

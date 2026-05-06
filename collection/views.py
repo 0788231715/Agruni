@@ -5,6 +5,61 @@ from django.urls import reverse_lazy
 from .models import ServiceRequest, DriverAssignment, Pickup, Subscription
 from .forms import ServiceRequestForm, SubscriptionForm
 
+class ZoneListView(LoginRequiredMixin, ListView):
+    model = Zone
+    template_name = "collection/zone_list.html"
+    context_object_name = "zones"
+
+class ZoneCreateView(LoginRequiredMixin, CreateView):
+    model = Zone
+    fields = ["sector", "name", "manager"]
+    template_name = "collection/zone_form.html"
+    success_url = reverse_lazy("collection:zone_list")
+
+    def form_valid(self, form):
+        messages.success(self.request, f"Zone {form.cleaned_data['name']} created successfully.")
+        return super().form_valid(form)
+
+class ServiceRequestApproveView(LoginRequiredMixin, UpdateView):
+    model = ServiceRequest
+    fields = []
+    template_name = "collection/request_confirm.html"
+    success_url = reverse_lazy("dashboard:index")
+
+    def post(self, request, *args, **kwargs):
+        obj = self.get_object()
+        obj.status = ServiceRequest.RequestStatus.APPROVED
+        obj.save()
+        
+        # Notify Customer
+        Notification.objects.create(
+            user=obj.customer,
+            title="Request Approved",
+            message=f"Your collection request #{obj.id} has been approved."
+        )
+        messages.success(request, "Request approved successfully.")
+        return redirect(self.success_url)
+
+class ServiceRequestRejectView(LoginRequiredMixin, UpdateView):
+    model = ServiceRequest
+    fields = []
+    template_name = "collection/request_confirm.html"
+    success_url = reverse_lazy("dashboard:index")
+
+    def post(self, request, *args, **kwargs):
+        obj = self.get_object()
+        obj.status = ServiceRequest.RequestStatus.CANCELLED
+        obj.save()
+        
+        # Notify Customer
+        Notification.objects.create(
+            user=obj.customer,
+            title="Request Rejected",
+            message=f"Your collection request #{obj.id} has been rejected/cancelled."
+        )
+        messages.error(request, "Request rejected.")
+        return redirect(self.success_url)
+
 class SubscriptionCreateView(LoginRequiredMixin, CreateView):
     model = Subscription
     form_class = SubscriptionForm
