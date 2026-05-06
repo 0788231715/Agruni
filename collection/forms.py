@@ -1,12 +1,21 @@
 from django import forms
-from .models import ServiceRequest
+from .models import ServiceRequest, Subscription, Zone
 
 class ServiceRequestForm(forms.ModelForm):
     class Meta:
         model = ServiceRequest
-        fields = ["service", "waste_category", "location", "preferred_date", "notes"]
+        fields = ["service", "waste_category", "zone", "location_details", "preferred_date", "notes"]
         widgets = {
             'preferred_date': forms.DateInput(attrs={'type': 'date'}),
-            'location': forms.Textarea(attrs={'rows': 3}),
+            'location_details': forms.Textarea(attrs={'rows': 3}),
             'notes': forms.Textarea(attrs={'rows': 2}),
+        }
+
+class SubscriptionForm(forms.ModelForm):
+    class Meta:
+        model = Subscription
+        fields = ["customer_type", "service", "zone", "frequency", "agreed_fee", "start_date", "end_date"]
+        widgets = {
+            'start_date': forms.DateInput(attrs={'type': 'date'}),
+            'end_date': forms.DateInput(attrs={'type': 'date'}),
         }

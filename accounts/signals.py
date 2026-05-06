@@ -1,0 +1,52 @@
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from accounts.models import User, RegistrationRequest
+from collection.models import ServiceRequest, DriverAssignment
+from core.models import Notification
+
+@receiver(post_save, sender=User)
+def notify_new_user(sender, instance, created, **kwargs):
+    if created:
+        Notification.objects.create(
+            user=instance,
+            title="Welcome to WMRS",
+            message=f"Hello {instance.username}, your account has been created as a {instance.get_role_display()}."
+        )
+        # Notify Admin
+        admins = User.objects.filter(role=User.Role.ADMIN)
+        for admin in admins:
+            Notification.objects.create(
+                user=admin,
+                title="New User Registered",
+                message=f"{instance.username} joined as {instance.get_role_display()}."
+            )
+
+@receiver(post_save, sender=RegistrationRequest)
+def notify_reg_request(sender, instance, created, **kwargs):
+    if created:
+        targets = User.objects.filter(role__in=[User.Role.ADMIN, User.Role.SECRETARY])
+        for target in targets:
+            Notification.objects.create(
+                user=target,
+                title="New Registration Inquiry",
+                message=f"New request from {instance.full_name}. Please review."
+            )
+
+@receiver(post_save, sender=ServiceRequest)
+def notify_collector_assignment(sender, instance, created, **kwargs):
+    # If a collector is assigned to a request
+    if instance.collector:
+        Notification.objects.create(
+            user=instance.collector,
+            title="New Collection Assigned",
+            message=f"You have been assigned to collect from {instance.customer.username} on {instance.preferred_date}."
+        )
+
+@receiver(post_save, sender=DriverAssignment)
+def notify_driver_assignment(sender, instance, created, **kwargs):
+    if created:
+        Notification.objects.create(
+            user=instance.driver,
+            title="New Transport Task",
+            message=f"New task: Transport waste for Request #{instance.request.id} using {instance.vehicle.plate_number}."
+        )

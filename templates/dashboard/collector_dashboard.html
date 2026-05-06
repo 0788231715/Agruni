@@ -1,0 +1,60 @@
+{% extends "dashboard/dashboard_base.html" %}
+
+{% block title %}Collector Dashboard - WMRS{% endblock %}
+{% block header %}My Collection Tasks{% endblock %}
+
+{% block dashboard_content %}
+<div class="row g-4 mb-4">
+    <div class="col-md-8">
+        <div class="card p-4">
+            <h5>Assigned Customers (Subscriptions)</h5>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Customer</th>
+                            <th>Type</th>
+                            <th>Fee</th>
+                            <th>Frequency</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for sub in assigned_customers %}
+                            <tr>
+                                <td>{{ sub.customer.username }}</td>
+                                <td>{{ sub.get_customer_type_display }}</td>
+                                <td>RWF {{ sub.agreed_fee }}</td>
+                                <td>{{ sub.get_frequency_display }}</td>
+                                <td><a href="{% url 'payments:record_payment' %}" class="btn btn-sm btn-primary">Record Payment</a></td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="5" class="text-center text-muted">No assigned customers.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card p-4 mb-4">
+            <h5>My Recent Earnings</h5>
+            <ul class="list-group list-group-flush">
+                {% for earning in my_earnings %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ earning.period_end|date:"M Y" }}
+                        <span class="badge bg-success">RWF {{ earning.amount }}</span>
+                    </li>
+                {% empty %}
+                    <li class="list-group-item text-muted">No records found.</li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="card p-4">
+            <h5>Cash on Hand</h5>
+            <p class="h3 mb-3 text-success">RWF 0</p>
+            <button class="btn btn-warning w-100">Handover to Manager</button>
+        </div>
+    </div>
+</div>
+{% endblock %}

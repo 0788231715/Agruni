@@ -1,0 +1,62 @@
+{% extends "dashboard/dashboard_base.html" %}
+
+{% block title %}Cash Handovers - WMRS{% endblock %}
+{% block header %}Money Handovers & Verification{% endblock %}
+
+{% block dashboard_content %}
+<div class="card p-4 shadow-sm border-0">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h5 class="fw-bold mb-0">Pending & Recent Handovers</h5>
+        {% if user.role == 'COLLECTOR' %}
+            <a href="{% url 'payments:create_handover' %}" class="btn btn-warning btn-sm px-3 shadow-sm">
+                <i class="bi bi-send me-1"></i> New Handover
+            </a>
+        {% endif %}
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for h in handovers %}
+                <tr>
+                    <td>
+                        <div class="fw-bold">{{ h.from_user.get_full_name|default:h.from_user.username }}</div>
+                        <small class="text-muted">Collector</small>
+                    </td>
+                    <td>
+                        <div class="fw-bold">{{ h.to_user.get_full_name|default:h.to_user.username }}</div>
+                        <small class="text-muted">Manager</small>
+                    </td>
+                    <td class="text-success fw-bold">RWF {{ h.amount }}</td>
+                    <td class="small text-muted">{{ h.created_at|date:"M d, Y H:i" }}</td>
+                    <td>
+                        <span class="badge rounded-pill bg-{% if h.status == 'RECEIVED' %}success{% elif h.status == 'PENDING' %}warning text-dark{% else %}danger{% endif %}">
+                            {{ h.get_status_display }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if h.status == 'PENDING' and h.to_user == user %}
+                            <a href="{% url 'payments:verify_handover' h.id %}" class="btn btn-sm btn-success px-3 rounded-pill">Verify</a>
+                        {% else %}
+                            <span class="text-muted small">N/A</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" class="text-center py-4 text-muted">No handovers recorded in your region.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,21 +1,65 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm, UserChangeForm
-from .models import User, Profile
+from .models import User, Profile, RegistrationRequest
+from django.core.exceptions import ValidationError
 
-class UserRegistrationForm(UserCreationForm):
-    class Meta(UserCreationForm.Meta):
-        model = User
-        fields = ("username", "email", "phone_number", "address")
+class RegistrationRequestForm(forms.ModelForm):
+    class Meta:
+        model = RegistrationRequest
+        fields = ["full_name", "email", "phone_number", "address", "customer_type"]
 
-class UserUpdateForm(forms.ModelForm):
+class DashboardUserRegistrationForm(forms.ModelForm):
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Enter password'}),
+        help_text="Minimum 8 characters"
+    )
+    confirm_password = forms.CharField(
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Confirm password'})
+    )
+
     class Meta:
         model = User
-        fields = ("first_name", "last_name", "email", "phone_number", "address", "profile_picture")
+        fields = [
+            'username', 'first_name', 'last_name', 'email', 
+            'phone_number', 'role', 'address', 'is_active', 'is_verified'
+        ]
+        widgets = {
+            'username': forms.TextInput(attrs={'class': 'form-control'}),
+            'first_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'phone_number': forms.TextInput(attrs={'class': 'form-control'}),
+            'role': forms.Select(attrs={'class': 'form-select'}),
+            'address': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
+            'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+            'is_verified': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }
+
+    def clean_confirm_password(self):
+        password = self.cleaned_data.get("password")
+        confirm_password = self.cleaned_data.get("confirm_password")
+        if password and confirm_password and password != confirm_password:
+            raise ValidationError("Passwords do not match.")
+        return confirm_password
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.set_password(self.cleaned_data["password"])
+        if commit:
+            user.save()
+        return user
+
+class UserRegistrationForm(forms.ModelForm):
+    password = forms.CharField(widget=forms.PasswordInput)
+    class Meta:
+        model = User
+        fields = ["username", "email", "phone_number", "role"]
 
 class ProfileUpdateForm(forms.ModelForm):
     class Meta:
         model = Profile
-        fields = ("bio", "location", "birth_date")
-        widgets = {
-            'birth_date': forms.DateInput(attrs={'type': 'date'}),
-        }
+        fields = ["bio", "location", "birth_date"]
+
+class UserUpdateForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ["first_name", "last_name", "email", "phone_number", "address", "latitude", "longitude", "profile_picture"]

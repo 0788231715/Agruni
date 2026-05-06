@@ -1,0 +1,23 @@
+{% extends "dashboard/dashboard_base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}Waste Sorting - WMRS{% endblock %}
+{% block header %}Record New Sorting{% endblock %}
+
+{% block dashboard_content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm p-4">
+            <h5 class="fw-bold mb-4 text-success">Sorting Details</h5>
+            <form method="post">
+                {% csrf_token %}
+                {{ form|crispy }}
+                <div class="d-flex gap-2 justify-content-end mt-4">
+                    <a href="{% url 'dashboard:index' %}" class="btn btn-light px-4">Cancel</a>
+                    <button type="submit" class="btn btn-success px-5 fw-bold shadow-sm">Save Record</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

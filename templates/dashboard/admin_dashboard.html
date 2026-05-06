@@ -1,92 +1,468 @@
-{% extends 'dashboard/dashboard_base.html' %}
+{% extends "dashboard/dashboard_base.html" %}
 
 {% block title %}Admin Dashboard - WMRS{% endblock %}
-{% block header %}System Overview{% endblock %}
+{% block header %}Executive Overview{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dashboard-kpi-link {
+        text-decoration: none;
+        color: inherit;
+        display: block;
+    }
+
+    .dashboard-kpi-link:hover {
+        color: inherit;
+    }
+
+    .chart-wrapper {
+        position: relative;
+        height: 320px;
+        width: 100%;
+    }
+
+    .map-card {
+        overflow: hidden;
+    }
+
+    .map-legend {
+        position: absolute;
+        right: 18px;
+        bottom: 18px;
+        z-index: 500;
+        background: #fff;
+        border-radius: 14px;
+        padding: 12px 14px;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+        font-size: 0.8rem;
+    }
+
+    .legend-dot {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        margin-right: 7px;
+    }
+
+    @media (max-width: 768px) {
+        .chart-wrapper {
+            height: 260px;
+        }
+
+        .map-legend {
+            left: 12px;
+            right: 12px;
+            bottom: 12px;
+        }
+    }
+</style>
+{% endblock %}
 
 {% block dashboard_content %}
+
+<div class="row g-3 mb-4">
+    <div class="col-xl-3 col-md-6">
+        <a href="{% url 'dashboard:financial_summary' %}" class="dashboard-kpi-link">
+            <div class="card stats-card h-100 p-3 shadow-sm" style="border-left-color:#198754 !important;">
+                <div class="d-flex align-items-center">
+                    <div class="flex-shrink-0 bg-success-subtle p-3 rounded-3 me-3 text-success">
+                        <i class="bi bi-cash-stack fs-3"></i>
+                    </div>
+                    <div>
+                        <p class="text-muted mb-0 small fw-bold text-uppercase">Total Revenue</p>
+                        <h4 class="mb-0 fw-bold">RWF {{ total_revenue|default:0|floatformat:0 }}</h4>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card h-100 p-3 shadow-sm" style="border-left-color:#dc3545 !important;">
+            <div class="d-flex align-items-center">
+                <div class="flex-shrink-0 bg-danger-subtle p-3 rounded-3 me-3 text-danger">
+                    <i class="bi bi-cart-dash fs-3"></i>
+                </div>
+                <div>
+                    <p class="text-muted mb-0 small fw-bold text-uppercase">Total Expenses</p>
+                    <h4 class="mb-0 fw-bold">RWF {{ total_expenses|default:0|floatformat:0 }}</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card h-100 p-3 shadow-sm" style="border-left-color:#0dcaf0 !important;">
+            <div class="d-flex align-items-center">
+                <div class="flex-shrink-0 bg-info-subtle p-3 rounded-3 me-3 text-info">
+                    <i class="bi bi-graph-up-arrow fs-3"></i>
+                </div>
+                <div>
+                    <p class="text-muted mb-0 small fw-bold text-uppercase">Net Profit</p>
+                    <h4 class="mb-0 fw-bold">RWF {{ net_profit|default:0|floatformat:0 }}</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card h-100 p-3 shadow-sm" style="border-left-color:#6610f2 !important;">
+            <div class="d-flex align-items-center">
+                <div class="flex-shrink-0 bg-primary-subtle p-3 rounded-3 me-3 text-primary">
+                    <i class="bi bi-person-check fs-3"></i>
+                </div>
+                <div>
+                    <p class="text-muted mb-0 small fw-bold text-uppercase">Paid Clients</p>
+                    <h4 class="mb-0 fw-bold">{{ paid_clients|default:0 }}</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card h-100 p-3 shadow-sm" style="border-left-color:#fd7e14 !important;">
+            <div class="d-flex align-items-center">
+                <div class="flex-shrink-0 bg-warning-subtle p-3 rounded-3 me-3 text-warning">
+                    <i class="bi bi-exclamation-triangle fs-3"></i>
+                </div>
+                <div>
+                    <p class="text-muted mb-0 small fw-bold text-uppercase">Unpaid Clients</p>
+                    <h4 class="mb-0 fw-bold">{{ unpaid_clients|default:0 }}</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card h-100 p-3 shadow-sm" style="border-left-color:#20c997 !important;">
+            <div class="d-flex align-items-center">
+                <div class="flex-shrink-0 p-3 rounded-3 me-3" style="color:#20c997;background:#e6fffa;">
+                    <i class="bi bi-people fs-3"></i>
+                </div>
+                <div>
+                    <p class="text-muted mb-0 small fw-bold text-uppercase">Total Customers</p>
+                    <h4 class="mb-0 fw-bold">{{ total_customers|default:0 }}</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card h-100 p-3 shadow-sm" style="border-left-color:#0d6efd !important;">
+            <div class="d-flex align-items-center">
+                <div class="flex-shrink-0 bg-primary-subtle p-3 rounded-3 me-3 text-primary">
+                    <i class="bi bi-truck fs-3"></i>
+                </div>
+                <div>
+                    <p class="text-muted mb-0 small fw-bold text-uppercase">Active Drivers</p>
+                    <h4 class="mb-0 fw-bold">{{ active_drivers|default:0 }}</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="card stats-card h-100 p-3 shadow-sm" style="border-left-color:#198754 !important;">
+            <div class="d-flex align-items-center">
+                <div class="flex-shrink-0 bg-success-subtle p-3 rounded-3 me-3 text-success">
+                    <i class="bi bi-geo-fill fs-3"></i>
+                </div>
+                <div>
+                    <p class="text-muted mb-0 small fw-bold text-uppercase">Active Collectors</p>
+                    <h4 class="mb-0 fw-bold">{{ active_collectors|default:0 }}</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="row g-4 mb-4">
-    <div class="col-md-3">
-        <div class="card stats-card h-100 p-3">
-            <div class="text-muted small">Total Customers</div>
-            <div class="d-flex align-items-center">
-                <h2 class="mb-0">{{ total_customers }}</h2>
-                <div class="ms-auto text-success"><i class="bi bi-people fs-3"></i></div>
+    <div class="col-lg-8">
+        <div class="card h-100 shadow-sm">
+            <div class="card-header bg-white py-3 border-0 d-flex justify-content-between align-items-center">
+                <div>
+                    <h6 class="mb-0 fw-bold">
+                        <i class="bi bi-bar-chart-line me-2 text-success"></i>Financial Analytics
+                    </h6>
+                    <small class="text-muted">Monthly revenue performance</small>
+                </div>
+
+                <a href="{% url 'reports:financial_report' %}" class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-download me-1"></i> Export PDF
+                </a>
+            </div>
+
+            <div class="card-body">
+                <div class="chart-wrapper">
+                    <canvas id="revenueChart"></canvas>
+                </div>
             </div>
         </div>
     </div>
-    <div class="col-md-3">
-        <div class="card stats-card h-100 p-3">
-            <div class="text-muted small">Pending Requests</div>
-            <div class="d-flex align-items-center">
-                <h2 class="mb-0">{{ pending_requests }}</h2>
-                <div class="ms-auto text-warning"><i class="bi bi-clock-history fs-3"></i></div>
+
+    <div class="col-lg-4">
+        <div class="card h-100 shadow-sm">
+            <div class="card-header bg-white py-3 border-0">
+                <h6 class="mb-0 fw-bold">
+                    <i class="bi bi-activity me-2 text-success"></i>Operational Status
+                </h6>
             </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card stats-card h-100 p-3">
-            <div class="text-muted small">Total Revenue</div>
-            <div class="d-flex align-items-center">
-                <h2 class="mb-0">RWF {{ total_revenue }}</h2>
-                <div class="ms-auto text-primary"><i class="bi bi-cash-stack fs-3"></i></div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3">
-        <div class="card stats-card h-100 p-3">
-            <div class="text-muted small">Pending Complaints</div>
-            <div class="d-flex align-items-center">
-                <h2 class="mb-0">{{ pending_complaints }}</h2>
-                <div class="ms-auto text-danger"><i class="bi bi-exclamation-triangle fs-3"></i></div>
+
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-3">
+                        <div>
+                            <p class="mb-0 small fw-bold">Pending Handovers</p>
+                            <small class="text-muted">Cash waiting verification</small>
+                        </div>
+                        <span class="badge bg-warning text-dark rounded-pill">{{ pending_handovers|default:0 }}</span>
+                    </li>
+
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-3">
+                        <div>
+                            <p class="mb-0 small fw-bold">Active Subscriptions</p>
+                            <small class="text-muted">Recurring waste collections</small>
+                        </div>
+                        <span class="badge bg-success rounded-pill">{{ active_subscriptions|default:0 }}</span>
+                    </li>
+
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-3">
+                        <div>
+                            <p class="mb-0 small fw-bold">Customer Complaints</p>
+                            <small class="text-muted">Pending resolution</small>
+                        </div>
+                        <span class="badge bg-danger rounded-pill">{{ pending_complaints|default:0 }}</span>
+                    </li>
+                </ul>
+
+                <div class="p-4" style="background:#f8f9fa;">
+                    <p class="small text-muted mb-3 text-uppercase fw-bold">Management Shortcuts</p>
+
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'accounts:register_user' %}" class="btn btn-success btn-sm py-2"><i class="bi bi-person-plus me-2"></i> Register New Staff</a>
+                        <a href="{% url 'payments:record_expense' %}" class="btn btn-outline-danger btn-sm py-2"><i class="bi bi-dash-circle me-2"></i> Record Expense</a>
+                        <a href="/admin/accounts/registrationrequest/" class="btn btn-outline-dark btn-sm py-2"><i class="bi bi-envelope-check me-2"></i> View Inquiries</a>
+                    </div>
+
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 <div class="row g-4">
-    <div class="col-lg-8">
-        <div class="card p-4 h-100">
-            <h5 class="mb-4">Monthly Collection Performance</h5>
-            <canvas id="performanceChart" height="250"></canvas>
-        </div>
-    </div>
-    <div class="col-lg-4">
-        <div class="card p-4 h-100">
-            <h5 class="mb-4">Waste Distribution</h5>
-            <canvas id="wasteChart" height="250"></canvas>
+    <div class="col-12">
+        <div class="card map-card shadow-sm">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center border-0">
+                <div>
+                    <h6 class="mb-0 fw-bold">
+                        <i class="bi bi-geo-alt-fill me-2 text-success"></i>
+                        Real-Time Field Operations Map
+                    </h6>
+                    <small class="text-muted">Live locations of collectors, drivers, and clients across Rwanda</small>
+                </div>
+
+                <div class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2">
+                    <span class="spinner-grow spinner-grow-sm me-1"></span>
+                    Live Updates
+                </div>
+            </div>
+
+            <div class="card-body p-0 position-relative">
+                <div id="map" class="wmrs-map"></div>
+
+                <div class="map-legend">
+                    <div class="fw-bold mb-2 border-bottom pb-1 small">User Legend</div>
+                    <div class="mb-1"><span class="legend-dot" style="background:#6f42c1;"></span> Admin/Boss</div>
+                    <div class="mb-1"><span class="legend-dot" style="background:#1b4332;"></span> Gen. Manager</div>
+                    <div class="mb-1"><span class="legend-dot" style="background:#dc3545;"></span> Loc. Manager</div>
+                    <div class="mb-1"><span class="legend-dot" style="background:#198754;"></span> Collector</div>
+                    <div class="mb-1"><span class="legend-dot" style="background:#fd7e14;"></span> Driver</div>
+                    <div class="mb-1"><span class="legend-dot" style="background:#0d6efd;"></span> Customer</div>
+                    <div class="mb-1"><span class="legend-dot" style="background:#20c997;"></span> Sorting Staff</div>
+                    <div class="mb-1"><span class="legend-dot" style="background:#ffc107;"></span> Supervisor</div>
+                    <div class="mb-1"><span class="legend-dot" style="background:#e83e8c;"></span> Secretary</div>
+                    <div class="mb-1"><span class="legend-dot" style="background:#0dcaf0;"></span> Finance</div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
 {% endblock %}
 
 {% block extra_js %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // Placeholder charts
-    const ctx1 = document.getElementById('performanceChart').getContext('2d');
-    new Chart(ctx1, {
-        type: 'line',
-        data: {
-            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-            datasets: [{
-                label: 'Collections',
-                data: [12, 19, 3, 5, 2, 3],
-                borderColor: '#2d6a4f',
-                tension: 0.1
-            }]
-        }
-    });
+document.addEventListener('DOMContentLoaded', function () {
+    const chartElement = document.getElementById('revenueChart');
 
-    const ctx2 = document.getElementById('wasteChart').getContext('2d');
-    new Chart(ctx2, {
-        type: 'doughnut',
-        data: {
-            labels: ['Plastic', 'Paper', 'Organic', 'Glass'],
-            datasets: [{
-                data: [30, 20, 40, 10],
-                backgroundColor: ['#2d6a4f', '#40916c', '#95d5b2', '#1b4332']
-            }]
+    if (chartElement && typeof Chart !== 'undefined') {
+        new Chart(chartElement.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: {{ chart_labels|default:"[]"|safe }},
+                datasets: [{
+                    label: 'Monthly Revenue',
+                    data: {{ chart_data|default:"[]"|safe }},
+                    borderColor: '#2d6a4f',
+                    backgroundColor: 'rgba(45,106,79,0.12)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { intersect: false, mode: 'index' },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const value = context.parsed.y || 0;
+                                return 'Revenue: RWF ' + value.toLocaleString();
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: '#eeeeee' },
+                        ticks: {
+                            callback: function(value) {
+                                return 'RWF ' + value.toLocaleString();
+                            }
+                        }
+                    },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+    }
+
+    const mapElement = document.getElementById('map');
+
+    if (mapElement && typeof L !== 'undefined') {
+        if (mapElement._leaflet_id) {
+            mapElement._leaflet_id = null;
+            mapElement.innerHTML = '';
         }
-    });
+
+        const kigaliCenter = [-1.9441, 30.0619];
+
+        const map = L.map('map', {
+            zoomControl: true,
+            scrollWheelZoom: false,
+            attributionControl: true,
+            preferCanvas: true
+        }).setView(kigaliCenter, 12);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        L.circleMarker(kigaliCenter, {
+            radius: 11,
+            fillColor: '#198754',
+            color: '#fff',
+            weight: 3,
+            opacity: 1,
+            fillOpacity: 0.95
+        }).addTo(map).bindPopup(`
+            <strong>WMRS Operations Center</strong><br>
+            <small>Kigali, Rwanda</small>
+        `);
+
+        const markers = {};
+
+        function getColor(user) {
+            const role = (user.role || '').toLowerCase();
+
+            if (user.color) return user.color;
+            if (role.includes('driver')) return '#0d6efd';
+            if (role.includes('collector')) return '#fd7e14';
+            if (role.includes('manager')) return '#198754';
+            if (role.includes('alert') || role.includes('issue')) return '#dc3545';
+
+            return '#0d6efd';
+        }
+
+        function popup(user) {
+            return `
+                <div style="min-width:170px;">
+                    <strong>${user.name || 'Field User'}</strong><br>
+                    <span style="display:inline-block;margin:5px 0;padding:3px 8px;border-radius:999px;background:#f1f3f5;font-size:12px;">
+                        ${user.role || 'Field Staff'}
+                    </span><br>
+                    <small>${user.username || ''}</small>
+                </div>
+            `;
+        }
+
+        function updateMap() {
+            fetch('/accounts/api/locations/')
+                .then(response => {
+                    if (!response.ok) throw new Error('Location API failed');
+                    return response.json();
+                })
+                .then(data => {
+                    if (!Array.isArray(data)) return;
+
+                    data.forEach(user => {
+                        if (!user.lat || !user.lng) return;
+
+                        const lat = parseFloat(user.lat);
+                        const lng = parseFloat(user.lng);
+
+                        if (Number.isNaN(lat) || Number.isNaN(lng)) return;
+
+                        const markerId = user.username || user.name || `${lat}-${lng}`;
+
+                        if (markers[markerId]) {
+                            markers[markerId].setLatLng([lat, lng]);
+                            markers[markerId].setPopupContent(popup(user));
+                        } else {
+                            markers[markerId] = L.circleMarker([lat, lng], {
+                                radius: 9,
+                                fillColor: getColor(user),
+                                color: '#fff',
+                                weight: 3,
+                                opacity: 1,
+                                fillOpacity: 0.9
+                            }).addTo(map).bindPopup(popup(user));
+                        }
+                    });
+                })
+                .catch(error => console.warn('Map update failed:', error));
+        }
+
+        function fixMapSize() {
+            setTimeout(() => map.invalidateSize(), 300);
+            setTimeout(() => map.invalidateSize(), 800);
+            setTimeout(() => map.invalidateSize(), 1500);
+        }
+
+        fixMapSize();
+        updateMap();
+
+        setInterval(updateMap, 10000);
+
+        window.addEventListener('resize', () => {
+            map.invalidateSize();
+        });
+
+        document.addEventListener('click', () => {
+            setTimeout(() => map.invalidateSize(), 300);
+        });
+    }
+});
 </script>
 {% endblock %}

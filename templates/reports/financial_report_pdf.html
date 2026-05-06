@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Helvetica, sans-serif; }
+        .header { text-align: center; color: #1b4332; }
+        .summary-box { background: #f8f9fa; padding: 20px; border: 1px solid #dee2e6; margin-bottom: 30px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #dee2e6; padding: 8px; text-align: left; font-size: 10px; }
+        th { background-color: #2d6a4f; color: white; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Agruni WMRS - Financial Report</h1>
+        <p>Generated on: {{ report_date }}</p>
+    </div>
+
+    <div class="summary-box">
+        <h3>Operational Summary</h3>
+        <p><strong>Total Revenue:</strong> RWF {{ revenue|floatformat:2 }}</p>
+        <p><strong>Total Expenses:</strong> RWF {{ expenses|floatformat:2 }}</p>
+        <p><strong>Net Profit:</strong> RWF {{ profit|floatformat:2 }}</p>
+    </div>
+
+    <h4>Recent Invoices</h4>
+    <table>
+        <thead>
+            <tr>
+                <th>Invoice Number</th>
+                <th>Customer</th>
+                <th>Amount (RWF)</th>
+                <th>Status</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for inv in recent_invoices %}
+                <tr>
+                    <td>{{ inv.invoice_number }}</td>
+                    <td>{{ inv.subscription.customer.username }}</td>
+                    <td>{{ inv.amount }}</td>
+                    <td>{{ inv.get_status_display }}</td>
+                    <td>{{ inv.created_at|date:"Y-m-d" }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

@@ -46,7 +46,7 @@
                                     {{ request.get_status_display }}
                                 </span>
                             </td>
-                            <td><a href="#" class="btn btn-sm btn-outline-primary">Details</a></td>
+                            <td><a href="{% url 'collection:request_detail' request.id %}" class="btn btn-sm btn-outline-primary">Details</a></td>
                         </tr>
                         {% empty %}
                         <tr><td colspan="5" class="text-center text-muted">No requests found.</td></tr>

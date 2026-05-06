@@ -1,0 +1,101 @@
+{% extends "dashboard/dashboard_base.html" %}
+
+{% block title %}My Profile - WMRS{% endblock %}
+{% block header %}User Profile & History{% endblock %}
+
+{% block dashboard_content %}
+<div class="row g-4">
+    <div class="col-md-4">
+        <div class="card p-4 shadow-sm border-0 text-center">
+            {% if user.profile_picture %}
+                <img src="{{ user.profile_picture.url }}" class="rounded-circle mb-3 mx-auto" width="120" height="120" style="object-fit: cover;">
+            {% else %}
+                <i class="bi bi-person-circle display-1 text-muted mb-3"></i>
+            {% endif %}
+            <h4 class="fw-bold">{{ user.get_full_name|default:user.username }}</h4>
+            <span class="badge bg-success px-3 mb-3">{{ user.get_role_display }}</span>
+            <p class="text-muted small"><i class="bi bi-envelope me-1"></i> {{ user.email }}</p>
+            <p class="text-muted small"><i class="bi bi-phone me-1"></i> {{ user.phone_number|default:"No phone recorded" }}</p>
+            
+            <hr>
+            <div class="d-grid gap-2">
+                <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#requestChangeModal">
+                    Request Info Change
+                </button>
+                <small class="text-muted x-small">Changes require Admin approval</small>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <!-- History Section (Read Only) -->
+        <div class="card p-4 shadow-sm border-0">
+            <h5 class="mb-4">Recent Activity & Transactions</h5>
+            <div class="table-responsive">
+                <table class="table table-sm table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Date</th>
+                            <th>Description</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if user.role == 'CUSTOMER' %}
+                            {% for inv in user.subscriptions.first.invoices.all|slice:":10" %}
+                                <tr>
+                                    <td>{{ inv.created_at|date:"M d, Y" }}</td>
+                                    <td>Service Invoice #{{ inv.invoice_number }}</td>
+                                    <td>RWF {{ inv.amount }}</td>
+                                    <td><span class="badge bg-{% if inv.status == 'PAID' %}success{% else %}warning{% endif %}">{{ inv.get_status_display }}</span></td>
+                                </tr>
+                            {% empty %}
+                                <tr><td colspan="4" class="text-center text-muted">No transaction history found.</td></tr>
+                            {% endfor %}
+                        {% elif user.role == 'COLLECTOR' %}
+                            {% for pay in user.collected_payments.all|slice:":10" %}
+                                <tr>
+                                    <td>{{ pay.payment_date|date:"M d, Y" }}</td>
+                                    <td>Collected from {{ pay.invoice.subscription.customer.username }}</td>
+                                    <td>RWF {{ pay.amount }}</td>
+                                    <td><span class="badge bg-success">Recorded</span></td>
+                                </tr>
+                            {% empty %}
+                                <tr><td colspan="4" class="text-center text-muted">No collection history found.</td></tr>
+                            {% endfor %}
+                        {% else %}
+                            <tr><td colspan="4" class="text-center text-muted">History for your role is managed by the central ledger.</td></tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Request Change Modal -->
+<div class="modal fade" id="requestChangeModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content border-0">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Request Profile Update</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form>
+                <div class="modal-body">
+                    <p class="small text-muted">Please describe the changes you need (e.g., new phone number, address). The Admin will review your request.</p>
+                    <div class="mb-3">
+                        <label class="form-label">Change Details</label>
+                        <textarea class="form-control" rows="4" placeholder="Enter your request here..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-modal="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary">Send Request</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

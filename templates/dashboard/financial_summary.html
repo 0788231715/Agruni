@@ -1,0 +1,67 @@
+{% extends "dashboard/dashboard_base.html" %}
+
+{% block title %}Financial Summary - WMRS{% endblock %}
+{% block header %}Company Financial Summary{% endblock %}
+
+{% block dashboard_content %}
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card p-4 bg-success text-white">
+            <h6>Total Revenue (Paid)</h6>
+            <h2 class="fw-bold">RWF {{ total_revenue|floatformat:0 }}</h2>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card p-4 bg-warning text-dark">
+            <h6>Expected Revenue (Unpaid)</h6>
+            <h2 class="fw-bold">RWF {{ pending_revenue|floatformat:0 }}</h2>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card p-4 bg-danger text-white">
+            <h6>Total Operational Costs</h6>
+            <h2 class="fw-bold">RWF {{ total_expenses|floatformat:0 }}</h2>
+        </div>
+    </div>
+</div>
+
+<div class="card p-4 shadow-sm border-0">
+    <h5 class="mb-4">Recent Invoices & Transactions</h5>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Invoice #</th>
+                    <th>Customer</th>
+                    <th>Amount</th>
+                    <th>Due Date</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for inv in invoices %}
+                <tr>
+                    <td><span class="fw-bold">{{ inv.invoice_number }}</span></td>
+                    <td>{{ inv.subscription.customer.username }}</td>
+                    <td>RWF {{ inv.amount }}</td>
+                    <td>{{ inv.due_date }}</td>
+                    <td>
+                        <span class="badge rounded-pill bg-{% if inv.status == 'PAID' %}success{% else %}danger{% endif %}">
+                            {{ inv.get_status_display }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if user.role == 'ADMIN' or user.role == 'FINANCE' %}
+                            <a href="/admin/payments/invoice/{{ inv.id }}/change/" class="btn btn-sm btn-outline-primary">Manage</a>
+                        {% else %}
+                            <span class="text-muted small">Read Only</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

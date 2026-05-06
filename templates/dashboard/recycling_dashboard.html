@@ -1,0 +1,143 @@
+{% extends "dashboard/dashboard_base.html" %}
+
+{% block title %}Recycling Dashboard - WMRS{% endblock %}
+{% block header %}Waste Processing & Sustainability{% endblock %}
+
+{% block dashboard_content %}
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card p-4 border-start border-4 border-success">
+            <h6 class="text-muted small fw-bold">TOTAL SORTED</h6>
+            <h2 class="fw-bold">{{ total_sorted_weight }} kg</h2>
+            <div class="progress mt-2" style="height: 6px;">
+                <div class="progress-bar bg-success" role="progressbar" style="width: 100%"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card p-4 border-start border-4 border-info">
+            <h6 class="text-muted small fw-bold">TOTAL RECYCLED</h6>
+            <h2 class="fw-bold">{{ total_recycled_weight }} kg</h2>
+            <div class="progress mt-2" style="height: 6px;">
+                <div class="progress-bar bg-info" role="progressbar" style="width: {{ recycled_pc }}%"></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card p-4 border-start border-4 border-danger">
+            <h6 class="text-muted small fw-bold">TOTAL DISPOSED</h6>
+            <h2 class="fw-bold">{{ total_disposed_weight }} kg</h2>
+            <div class="progress mt-2" style="height: 6px;">
+                <div class="progress-bar bg-danger" role="progressbar" style="width: {{ disposed_pc }}%"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-lg-6">
+        <div class="card p-4 h-100 shadow-sm border-0">
+            <h6 class="fw-bold mb-4"><i class="bi bi-pie-chart me-2 text-success"></i>Waste by Category</h6>
+            <div style="height: 300px;">
+                <canvas id="categoryChart"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card p-4 h-100 shadow-sm border-0">
+            <h6 class="fw-bold mb-4"><i class="bi bi-gear-wide-connected me-2 text-success"></i>Pending Sorting Tasks</h6>
+            <div class="list-group list-group-flush">
+                {% for pickup in pending_sortings %}
+                    <div class="list-group-item d-flex justify-content-between align-items-center px-0 py-3">
+                        <div>
+                            <p class="mb-0 fw-bold">Pickup #{{ pickup.id }}</p>
+                            <small class="text-muted">Client: {{ pickup.assignment.request.customer.username }}</small>
+                        </div>
+                        <a href="{% url 'recycling:sorting_add' %}?pickup={{ pickup.id }}" class="btn btn-sm btn-success px-3 rounded-pill">Sort Waste</a>
+                    </div>
+                {% empty %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-check-circle display-4 text-success mb-2"></i>
+                        <p class="text-muted">All pickups sorted! Ready for processing.</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card p-4 shadow-sm border-0">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h6 class="fw-bold mb-0"><i class="bi bi-list-check me-2 text-success"></i>Recent Sorting Records</h6>
+        <a href="{% url 'recycling:waste_records' %}" class="btn btn-sm btn-outline-primary px-3">View All Records</a>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>Category</th>
+                    <th>Weight</th>
+                    <th>Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in recent_sortings %}
+                    <tr>
+                        <td><span class="badge bg-light text-dark border">{{ record.category.name }}</span></td>
+                        <td><span class="fw-bold text-success">{{ record.weight_kg }} kg</span></td>
+                        <td class="small text-muted">{{ record.sorting_date|date:"M d, Y H:i" }}</td>
+                        <td>
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-light border-0" type="button" data-bs-toggle="dropdown">
+                                    <i class="bi bi-three-dots-vertical"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end shadow border-0 p-2">
+                                    <li><a class="dropdown-item rounded py-2 small" href="{% url 'recycling:recycling_add' %}?sorting={{ record.id }}"><i class="bi bi-recycle me-2 text-success"></i> Mark Recycled</a></li>
+                                    <li><a class="dropdown-item rounded py-2 small" href="{% url 'recycling:disposal_add' %}?sorting={{ record.id }}"><i class="bi bi-trash me-2 text-danger"></i> Mark Disposed</a></li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="4" class="text-center py-4 text-muted">No sorting records found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const catCtx = document.getElementById('categoryChart').getContext('2d');
+    new Chart(catCtx, {
+        type: 'doughnut',
+        data: {
+            labels: {{ cat_labels|safe }},
+            datasets: [{
+                data: {{ cat_data|safe }},
+                backgroundColor: [
+                    '#2d6a4f', '#40916c', '#52b788', '#74c69d', '#95d5b2', '#b7e4c7'
+                ],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 20,
+                        usePointStyle: true,
+                        font: { size: 12 }
+                    }
+                }
+            },
+            cutout: '70%'
+        }
+    });
+</script>
+{% endblock %}

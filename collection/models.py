@@ -2,6 +2,21 @@ from django.db import models
 from django.conf import settings
 from services.models import Service, WasteCategory
 
+class District(models.Model):
+    name = models.CharField(max_length=100)
+    def __str__(self): return self.name
+
+class Sector(models.Model):
+    district = models.ForeignKey(District, on_delete=models.CASCADE, related_name="sectors")
+    name = models.CharField(max_length=100)
+    def __str__(self): return f"{self.name} ({self.district.name})"
+
+class Zone(models.Model):
+    sector = models.ForeignKey(Sector, on_delete=models.CASCADE, related_name="zones")
+    name = models.CharField(max_length=100)
+    manager = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, limit_choices_to={'role': 'LOCATION_MANAGER'}, related_name="managed_zones")
+    def __str__(self): return f"{self.name} ({self.sector.name})"
+
 class Vehicle(models.Model):
     class VehicleStatus(models.TextChoices):
         AVAILABLE = "AVAILABLE", "Available"
@@ -39,9 +54,11 @@ class ServiceRequest(models.Model):
     customer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="requests")
     service = models.ForeignKey(Service, on_delete=models.CASCADE)
     waste_category = models.ForeignKey(WasteCategory, on_delete=models.SET_NULL, null=True)
-    location = models.TextField()
+    zone = models.ForeignKey(Zone, on_delete=models.SET_NULL, null=True, blank=True)
+    location_details = models.TextField(help_text="Specific address or landmarks", default="")
     preferred_date = models.DateField()
     status = models.CharField(max_length=20, choices=RequestStatus.choices, default=RequestStatus.PENDING)
+    collector = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, limit_choices_to={'role': 'COLLECTOR'}, related_name="assigned_requests")
     notes = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -51,13 +68,29 @@ class ServiceRequest(models.Model):
 
 class Subscription(models.Model):
     class Frequency(models.TextChoices):
+        DAILY = "DAILY", "Daily"
         WEEKLY = "WEEKLY", "Weekly"
         BIWEEKLY = "BIWEEKLY", "Bi-Weekly"
         MONTHLY = "MONTHLY", "Monthly"
+        CUSTOM = "CUSTOM", "Custom"
+
+    class CustomerType(models.TextChoices):
+        HOME = "HOME", "Home"
+        BUILDING = "BUILDING", "Building"
+        COMPANY = "COMPANY", "Company"
+        INSTITUTION = "INSTITUTION", "Institution"
+        SHOP = "SHOP", "Shop"
+        RESTAURANT = "RESTAURANT", "Restaurant"
+        HOTEL = "HOTEL", "Hotel"
+        OTHER = "OTHER", "Other"
 
     customer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="subscriptions")
+    customer_type = models.CharField(max_length=20, choices=CustomerType.choices, default=CustomerType.HOME)
     service = models.ForeignKey(Service, on_delete=models.CASCADE)
-    frequency = models.CharField(max_length=20, choices=Frequency.choices)
+    zone = models.ForeignKey(Zone, on_delete=models.SET_NULL, null=True, blank=True)
+    collector = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, limit_choices_to={'role': 'COLLECTOR'})
+    frequency = models.CharField(max_length=20, choices=Frequency.choices, default=Frequency.WEEKLY)
+    agreed_fee = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     start_date = models.DateField()
     end_date = models.DateField(null=True, blank=True)
     is_active = models.BooleanField(default=True)

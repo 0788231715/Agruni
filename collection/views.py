@@ -2,8 +2,18 @@ from django.shortcuts import render, redirect
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
-from .models import ServiceRequest, DriverAssignment, Pickup
-from .forms import ServiceRequestForm
+from .models import ServiceRequest, DriverAssignment, Pickup, Subscription
+from .forms import ServiceRequestForm, SubscriptionForm
+
+class SubscriptionCreateView(LoginRequiredMixin, CreateView):
+    model = Subscription
+    form_class = SubscriptionForm
+    template_name = "collection/subscription_form.html"
+    success_url = reverse_lazy("dashboard:index")
+
+    def form_valid(self, form):
+        # Secretary usually registers for a customer
+        return super().form_valid(form)
 
 class ServiceRequestCreateView(LoginRequiredMixin, CreateView):
     model = ServiceRequest
