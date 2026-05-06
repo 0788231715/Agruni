@@ -83,6 +83,7 @@ class DashboardIndexView(LoginRequiredMixin, TemplateView):
     def admin_dashboard(self, request):
         total_revenue = Invoice.objects.filter(status=Invoice.InvoiceStatus.PAID).aggregate(Sum('amount'))['amount__sum'] or 0
         total_expenses = Expense.objects.aggregate(Sum('amount'))['amount__sum'] or 0
+        total_weight = Pickup.objects.aggregate(Sum('actual_weight_kg'))['actual_weight_kg__sum'] or 0
         
         # Monthly Revenue Data for Chart
         from django.db.models.functions import TruncMonth
@@ -95,6 +96,9 @@ class DashboardIndexView(LoginRequiredMixin, TemplateView):
         chart_labels = [item['month'].strftime("%b %Y") for item in monthly_revenue]
         chart_data = [float(item['total']) for item in monthly_revenue]
 
+        net_profit = total_revenue - total_expenses
+        profit_status = "Profit" if net_profit >= 0 else "Loss"
+
         context = {
             "total_customers": User.objects.filter(role=User.Role.CUSTOMER).count(),
             "paid_clients": Invoice.objects.filter(status=Invoice.InvoiceStatus.PAID).values('subscription__customer').distinct().count(),
@@ -104,7 +108,9 @@ class DashboardIndexView(LoginRequiredMixin, TemplateView):
             "total_staff": User.objects.exclude(role=User.Role.CUSTOMER).count(),
             "total_revenue": total_revenue,
             "total_expenses": total_expenses,
-            "net_profit": total_revenue - total_expenses,
+            "total_weight": total_weight,
+            "net_profit": abs(net_profit),
+            "profit_status": profit_status,
             "pending_handovers": MoneyHandover.objects.filter(status=MoneyHandover.HandoverStatus.PENDING).count(),
             "pending_complaints": Complaint.objects.filter(status=Complaint.ComplaintStatus.PENDING).count(),
             "active_subscriptions": Subscription.objects.filter(is_active=True).count(),

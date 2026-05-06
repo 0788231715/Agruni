@@ -12,5 +12,7 @@ urlpatterns = [
     path("zones/add/", views.ZoneCreateView.as_view(), name="zone_add"),
     path("subscriptions/create/", views.SubscriptionCreateView.as_view(), name="subscription_create"),
     path("assignments/", views.DriverAssignmentListView.as_view(), name="assignment_list"),
+    path("vehicles/", views.VehicleListView.as_view(), name="vehicle_list"),
+    path("vehicles/add/", views.VehicleCreateView.as_view(), name="vehicle_add"),
     path("pickup/<int:pk>/update/", views.PickupUpdateView.as_view(), name="pickup_update"),
 ]

@@ -1,0 +1,23 @@
+{% extends "dashboard/dashboard_base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}Submit Complaint - WMRS{% endblock %}
+{% block header %}Customer Support Ticket{% endblock %}
+
+{% block dashboard_content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm p-4">
+            <h5 class="fw-bold mb-4 text-danger"><i class="bi bi-chat-dots me-2"></i>New Support Request</h5>
+            <form method="post">
+                {% csrf_token %}
+                {{ form|crispy }}
+                <div class="d-flex gap-2 justify-content-end mt-4">
+                    <a href="{% url 'complaints:complaint_list' %}" class="btn btn-light px-4">Cancel</a>
+                    <button type="submit" class="btn btn-danger px-5 fw-bold shadow-sm">Send Ticket</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

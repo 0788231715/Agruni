@@ -2,7 +2,22 @@ from django.shortcuts import render, redirect
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
-from .models import ServiceRequest, DriverAssignment, Pickup, Subscription
+from .models import ServiceRequest, DriverAssignment, Pickup, Subscription, Vehicle, Zone
+
+class VehicleListView(LoginRequiredMixin, ListView):
+    model = Vehicle
+    template_name = "collection/vehicle_list.html"
+    context_object_name = "vehicles"
+
+class VehicleCreateView(LoginRequiredMixin, CreateView):
+    model = Vehicle
+    fields = ["plate_number", "model", "capacity_kg", "status"]
+    template_name = "collection/vehicle_form.html"
+    success_url = reverse_lazy("collection:vehicle_list")
+
+    def form_valid(self, form):
+        messages.success(self.request, f"Vehicle {form.cleaned_data['plate_number']} added to fleet.")
+        return super().form_valid(form)
 from .forms import ServiceRequestForm, SubscriptionForm
 
 class ZoneListView(LoginRequiredMixin, ListView):

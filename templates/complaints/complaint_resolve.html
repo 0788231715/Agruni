@@ -1,0 +1,28 @@
+{% extends "dashboard/dashboard_base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}Resolve Complaint - WMRS{% endblock %}
+{% block header %}Resolve Ticket{% endblock %}
+
+{% block dashboard_content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card border-0 shadow-sm p-4">
+            <h5 class="fw-bold mb-3 text-danger">Complaint Details</h5>
+            <p><strong>Subject:</strong> {{ object.subject }}</p>
+            <p><strong>From:</strong> {{ object.customer.username }}</p>
+            <p class="mb-4"><strong>Message:</strong> {{ object.description }}</p>
+            
+            <hr>
+            <form method="post">
+                {% csrf_token %}
+                {{ form|crispy }}
+                <div class="d-flex gap-2 justify-content-end mt-4">
+                    <a href="{% url 'complaints:complaint_list' %}" class="btn btn-light px-4">Cancel</a>
+                    <button type="submit" class="btn btn-primary px-5 fw-bold shadow-sm">Save & Respond</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
