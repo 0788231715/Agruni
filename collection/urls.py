@@ -14,6 +14,7 @@ urlpatterns = [
     path("subscriptions/create/", views.SubscriptionCreateView.as_view(), name="subscription_create"),
     path("subscriptions/<int:pk>/", views.SubscriptionDetailView.as_view(), name="subscription_detail"),
     path("subscriptions/<int:pk>/download/", views.SubscriptionDownloadView.as_view(), name="subscription_download"),
+    path("my-clients/", views.CollectorClientListView.as_view(), name="my_clients"),
     path("assignments/", views.DriverAssignmentListView.as_view(), name="assignment_list"),
     path("vehicles/", views.VehicleListView.as_view(), name="vehicle_list"),
     path("vehicles/add/", views.VehicleCreateView.as_view(), name="vehicle_add"),

@@ -1,0 +1,46 @@
+{% extends "dashboard/dashboard_base.html" %}
+
+{% block title %}Announcements - WMRS{% endblock %}
+
+{% block header %}Recent Announcements{% endblock %}
+
+{% block dashboard_content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        {% if user.role == 'COLLECTOR' or user.role == 'ADMIN' or user.role == 'GENERAL_MANAGER' %}
+            <div class="text-end mb-4">
+                <a href="{% url 'core:announcement_create' %}" class="btn btn-success">
+                    <i class="bi bi-plus-lg me-2"></i>New Announcement
+                </a>
+            </div>
+        {% endif %}
+
+        {% for announcement in announcements %}
+            <div class="card shadow-sm border-0 mb-4 overflow-hidden">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold text-success">{{ announcement.title }}</h5>
+                    <span class="badge bg-light text-muted">{{ announcement.created_at|date:"F j, Y, H:i" }}</span>
+                </div>
+                <div class="card-body p-4">
+                    <p class="card-text fs-5">{{ announcement.message|linebreaks }}</p>
+                </div>
+                <div class="card-footer bg-light border-0 py-2 px-4">
+                    <small class="text-muted">
+                        <i class="bi bi-person-circle me-1"></i>
+                        Broadcasted by: <strong>{{ announcement.sender.get_full_name|default:announcement.sender.username }}</strong> 
+                        ({{ announcement.sender.get_role_display }})
+                    </small>
+                </div>
+            </div>
+        {% empty %}
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-5 text-center text-muted">
+                    <i class="bi bi-megaphone display-1 d-block mb-3 text-light"></i>
+                    <h4>No announcements found</h4>
+                    <p>When there are important updates, they will appear here.</p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

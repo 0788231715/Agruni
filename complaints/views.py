@@ -25,22 +25,38 @@ class ComplaintCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.customer = self.request.user
+        complaint = form.save() # Save first to use in notifications
         messages.success(self.request, "Your complaint has been submitted.")
         
-        # Notify Admins
+        # Notify Admins, Managers and relevant Collector
         from accounts.models import User
-        admins = User.objects.filter(role="ADMIN")
-        for admin in admins:
+        from collection.models import Subscription
+        
+        # 1. Notify all Admins and General Managers
+        staff_to_notify = User.objects.filter(
+            role__in=[User.Role.ADMIN, User.Role.GENERAL_MANAGER]
+        )
+        
+        # 2. Notify relevant Collector and Location Manager if they exist
+        sub = Subscription.objects.filter(customer=self.request.user, is_active=True).first()
+        if sub:
+            if sub.collector:
+                staff_to_notify |= User.objects.filter(id=sub.collector.id)
+            if sub.zone and sub.zone.manager:
+                staff_to_notify |= User.objects.filter(id=sub.zone.manager.id)
+
+        for staff in staff_to_notify.distinct():
             Notification.objects.create(
-                user=admin,
+                user=staff,
                 title="New Complaint Submitted",
-                message=f"Customer {self.request.user.username} submitted a complaint: {form.instance.subject}"
+                message=f"Customer {self.request.user.username} submitted a complaint: {complaint.subject}",
+                link=reverse_lazy("complaints:complaint_list")
             )
         return super().form_valid(form)
 
 class ComplaintResolveView(LoginRequiredMixin, UpdateView):
     model = Complaint
-    fields = ["response", "status"]
+    fields = ["admin_response", "status"]
     template_name = "complaints/complaint_resolve.html"
     success_url = reverse_lazy("complaints:complaint_list")
 

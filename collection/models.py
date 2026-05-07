@@ -15,6 +15,7 @@ class Zone(models.Model):
     sector = models.ForeignKey(Sector, on_delete=models.CASCADE, related_name="zones")
     name = models.CharField(max_length=100)
     manager = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, limit_choices_to={'role': 'LOCATION_MANAGER'}, related_name="managed_zones")
+    collectors = models.ManyToManyField(settings.AUTH_USER_MODEL, blank=True, limit_choices_to={'role': 'COLLECTOR'}, related_name="assigned_zones")
     def __str__(self): return f"{self.name} ({self.sector.name})"
 
 class Vehicle(models.Model):

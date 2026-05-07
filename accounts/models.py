@@ -26,9 +26,18 @@ class User(AbstractUser):
     longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
     profile_picture = models.ImageField(upload_to="profiles/", blank=True, null=True)
     is_verified = models.BooleanField(default=False)
+    last_seen = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return f"{self.username} ({self.get_role_display()})"
+
+    @property
+    def is_online(self):
+        if self.last_seen:
+            from django.utils import timezone
+            now = timezone.now()
+            return now - self.last_seen < timezone.timedelta(minutes=5)
+        return False
 
     @property
     def unread_notifications(self):
@@ -37,6 +46,18 @@ class User(AbstractUser):
     @property
     def unread_notifications_count(self):
         return self.unread_notifications.count()
+
+    @property
+    def unread_tasks(self):
+        return self.assigned_tasks.filter(is_read=False)
+
+    @property
+    def unread_tasks_count(self):
+        return self.unread_tasks.count()
+
+    @property
+    def unread_messages_count(self):
+        return self.received_messages.filter(is_read=False).count()
 
     def save(self, *args, **kwargs):
         # Automatically set staff/superuser status based on role

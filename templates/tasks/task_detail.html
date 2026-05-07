@@ -1,0 +1,64 @@
+{% extends "dashboard/dashboard_base.html" %}
+
+{% block title %}Task Details - WMRS{% endblock %}
+
+{% block header %}Task Details{% endblock %}
+
+{% block dashboard_content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold text-success">{{ task.title }}</h5>
+                <span class="badge {% if task.status == 'COMPLETED' %}bg-success{% elif task.status == 'IN_PROGRESS' %}bg-info{% else %}bg-warning{% endif %}">
+                    {{ task.get_status_display }}
+                </span>
+            </div>
+            <div class="card-body p-4">
+                <div class="mb-4">
+                    <p class="text-muted mb-1 small">Description</p>
+                    <div class="p-3 bg-light rounded">{{ task.description|linebreaks }}</div>
+                </div>
+
+                <div class="row g-4 mb-4">
+                    <div class="col-sm-6">
+                        <p class="text-muted mb-1 small">Assigned By</p>
+                        <p class="fw-bold">{{ task.creator.get_full_name|default:task.creator.username }} ({{ task.creator.get_role_display }})</p>
+                    </div>
+                    <div class="col-sm-6">
+                        <p class="text-muted mb-1 small">Assigned At</p>
+                        <p class="fw-bold">{{ task.created_at|date:"F j, Y, H:i" }}</p>
+                    </div>
+                    {% if task.is_read %}
+                        <div class="col-sm-12">
+                            <p class="text-muted mb-1 small">Seen At</p>
+                            <p class="fw-bold text-success"><i class="bi bi-check2-all me-1"></i> {{ task.read_at|date:"F j, Y, H:i" }}</p>
+                        </div>
+                    {% endif %}
+                </div>
+
+                {% if task.assignee == user and task.status != 'COMPLETED' %}
+                <hr>
+                <div class="d-flex gap-2 justify-content-end">
+                    <form action="{% url 'tasks:task_status_update' task.pk %}" method="post">
+                        {% csrf_token %}
+                        {% if task.status == 'PENDING' %}
+                            <input type="hidden" name="status" value="IN_PROGRESS">
+                            <button type="submit" class="btn btn-info px-4 text-white">Mark In Progress</button>
+                        {% elif task.status == 'IN_PROGRESS' %}
+                            <input type="hidden" name="status" value="COMPLETED">
+                            <button type="submit" class="btn btn-success px-4">Mark as Completed</button>
+                        {% endif %}
+                    </form>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="text-center">
+            <a href="{% url 'tasks:task_list' %}" class="text-muted text-decoration-none small">
+                <i class="bi bi-arrow-left me-1"></i> Back to Task List
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

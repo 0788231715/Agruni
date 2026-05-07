@@ -11,6 +11,7 @@ urlpatterns = [
     path("handovers/", views.MoneyHandoverListView.as_view(), name="handover_list"),
     path("handovers/create/", views.MoneyHandoverCreateView.as_view(), name="create_handover"),
     path("handovers/<int:pk>/verify/", views.MoneyHandoverVerifyView.as_view(), name="verify_handover"),
+    path("invoices/", views.CustomerInvoiceListView.as_view(), name="invoice_list"),
     path("invoices/unpaid/", views.UnpaidInvoiceListView.as_view(), name="unpaid_invoices"),
     path("expense/record/", views.ExpenseCreateView.as_view(), name="record_expense"),
 ]

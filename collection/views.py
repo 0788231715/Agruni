@@ -27,13 +27,33 @@ class ZoneListView(LoginRequiredMixin, ListView):
 
 class ZoneCreateView(LoginRequiredMixin, CreateView):
     model = Zone
-    fields = ["sector", "name", "manager"]
+    fields = ["sector", "name", "manager", "collectors"]
     template_name = "collection/zone_form.html"
     success_url = reverse_lazy("collection:zone_list")
 
     def form_valid(self, form):
         messages.success(self.request, f"Zone {form.cleaned_data['name']} created successfully.")
         return super().form_valid(form)
+
+class CollectorClientListView(LoginRequiredMixin, ListView):
+    model = Subscription
+    template_name = "collection/collector_clients.html"
+    context_object_name = "subscriptions"
+
+    def get_queryset(self):
+        return Subscription.objects.filter(collector=self.request.user, is_active=True).order_by('zone', 'customer__username')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Add payment info for each subscription
+        for sub in context['subscriptions']:
+            latest_invoice = sub.invoices.order_by('-created_at').first()
+            sub.latest_invoice = latest_invoice
+            if latest_invoice:
+                sub.is_paid_online = latest_invoice.payments.filter(payment_method='ONLINE').exists()
+            else:
+                sub.is_paid_online = False
+        return context
 
 class ServiceRequestApproveView(LoginRequiredMixin, UpdateView):
     model = ServiceRequest

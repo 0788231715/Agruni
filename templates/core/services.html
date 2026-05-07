@@ -1,42 +1,135 @@
 {% extends 'base.html' %}
 
-{% block title %}Our Services - WMRS{% endblock %}
+{% block title %}Our Services - WMRS Rwanda{% endblock %}
 
 {% block content %}
-<div class="bg-light py-5">
-    <div class="container text-center">
-        <h2 class="fw-bold">Professional Waste Solutions</h2>
-        <p class="lead text-muted">Tailored services for every need.</p>
+<!-- Hero Section -->
+<div class="bg-success text-white py-5 mb-5 shadow-sm" style="background: linear-gradient(rgba(45, 106, 79, 0.9), rgba(45, 106, 79, 0.9)), url('https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&q=80&w=2070') center/cover;">
+    <div class="container py-5 text-center">
+        <h1 class="display-4 fw-bold mb-3">Professional Waste Solutions</h1>
+        <p class="lead mb-4">WMRS provides comprehensive waste management and recycling services tailored for homes, businesses, and industrial sites across Rwanda.</p>
+        <a href="{% url 'accounts:register' %}" class="btn btn-light btn-lg px-5">Join WMRS Today</a>
     </div>
 </div>
 
-<div class="container py-5">
+<div class="container mb-5">
+    <div class="text-center mb-5">
+        <h2 class="fw-bold">Our Core Offerings</h2>
+        <div class="bg-success mx-auto mb-3" style="width: 60px; height: 3px;"></div>
+        <p class="text-muted">Explore our range of specialized waste management services designed for a cleaner environment.</p>
+    </div>
+
     <div class="row g-4">
         {% for service in services %}
         <div class="col-md-4">
-            <div class="card h-100 shadow-sm">
-                {% if service.image %}
-                <img src="{{ service.image.url }}" class="card-img-top" alt="{{ service.title }}">
-                {% else %}
-                <div class="bg-success text-white py-5 text-center">
-                    <i class="bi bi-gear display-4"></i>
+            <div class="card h-100 border-0 shadow-sm transition-hover">
+                <div class="position-relative">
+                    {% if service.image %}
+                    <img src="{{ service.image.url }}" class="card-img-top" alt="{{ service.title }}" style="height: 200px; object-fit: cover;">
+                    {% else %}
+                    <div class="bg-success-subtle d-flex align-items-center justify-content-center" style="height: 200px;">
+                        <i class="bi bi-recycle display-1 text-success opacity-25"></i>
+                    </div>
+                    {% endif %}
+                    <div class="position-absolute top-0 end-0 m-3">
+                        <span class="badge bg-success shadow-sm">{{ service.get_service_type_display }}</span>
+                    </div>
                 </div>
-                {% endif %}
-                <div class="card-body">
-                    <h5 class="card-title fw-bold">{{ service.title }}</h5>
-                    <p class="card-text text-muted">{{ service.description }}</p>
-                    <p class="h5 text-success">Starting from RWF {{ service.price }}</p>
-                </div>
-                <div class="card-footer bg-white border-0 pb-4">
-                    <a href="{% url 'accounts:register' %}" class="btn btn-outline-success w-100">Get Started</a>
+                <div class="card-body p-4">
+                    <h4 class="card-title fw-bold mb-3">{{ service.title }}</h4>
+                    <p class="card-text text-muted mb-4">{{ service.description }}</p>
+                    <div class="d-flex justify-content-between align-items-center mt-auto pt-3 border-top">
+                        <div class="text-success fw-bold h5 mb-0">RWF {{ service.price|floatformat:0 }}</div>
+                        <a href="{% url 'accounts:register' %}" class="btn btn-outline-success btn-sm px-4 rounded-pill">Subscribe</a>
+                    </div>
                 </div>
             </div>
         </div>
         {% empty %}
-        <div class="col-12 text-center">
-            <p>No services listed at the moment. Please contact us for inquiries.</p>
+        <div class="col-12 text-center py-5">
+            <div class="display-1 text-muted opacity-25 mb-3"><i class="bi bi-search"></i></div>
+            <h4 class="text-muted">No services found</h4>
+            <p>We are currently updating our service list. Please check back soon or <a href="{% url 'core:contact' %}" class="text-success">contact us</a>.</p>
         </div>
         {% endfor %}
     </div>
 </div>
+
+<!-- Why Choose Us -->
+<div class="bg-white py-5 border-top border-bottom mb-5">
+    <div class="container py-4">
+        <div class="row align-items-center g-5">
+            <div class="col-lg-6">
+                <h2 class="fw-bold mb-4">Why Choose WMRS?</h2>
+                <div class="d-flex gap-4 mb-4">
+                    <div class="bg-success-subtle p-3 rounded-circle h-100">
+                        <i class="bi bi-clock-history text-success h4 mb-0"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold">Reliable Schedule</h5>
+                        <p class="text-muted">Never miss a pickup. Our GPS-tracked fleet ensures timely and consistent collection according to your agreed frequency.</p>
+                    </div>
+                </div>
+                <div class="d-flex gap-4 mb-4">
+                    <div class="bg-success-subtle p-3 rounded-circle h-100">
+                        <i class="bi bi-shield-check text-success h4 mb-0"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold">Eco-Friendly Disposal</h5>
+                        <p class="text-muted">We prioritize recycling and proper waste segregation to minimize environmental impact and promote sustainability.</p>
+                    </div>
+                </div>
+                <div class="d-flex gap-4">
+                    <div class="bg-success-subtle p-3 rounded-circle h-100">
+                        <i class="bi bi-phone text-success h4 mb-0"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold">Smart Management</h5>
+                        <p class="text-muted">Manage your account, track requests, and pay invoices easily through our digital dashboard.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <img src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&q=80&w=1000" alt="Sustainable Waste" class="img-fluid rounded-4 shadow-lg">
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Process Section -->
+<div class="container py-5 mb-5 text-center">
+    <h2 class="fw-bold mb-5">How It Works</h2>
+    <div class="row g-4">
+        <div class="col-md-3">
+            <div class="h1 text-success-subtle fw-bold mb-3">01</div>
+            <h5 class="fw-bold">Register</h5>
+            <p class="text-muted small">Create an account and choose your preferred service plan.</p>
+        </div>
+        <div class="col-md-3">
+            <div class="h1 text-success-subtle fw-bold mb-3">02</div>
+            <h5 class="fw-bold">Agreement</h5>
+            <p class="text-muted small">Our secretary will finalize your service agreement and assign a collector.</p>
+        </div>
+        <div class="col-md-3">
+            <div class="h1 text-success-subtle fw-bold mb-3">03</div>
+            <h5 class="fw-bold">Collection</h5>
+            <p class="text-muted small">Waste is collected consistently according to your chosen schedule.</p>
+        </div>
+        <div class="col-md-3">
+            <div class="h1 text-success-subtle fw-bold mb-3">04</div>
+            <h5 class="fw-bold">Recycling</h5>
+            <p class="text-muted small">Collected waste is sorted and recycled in our specialized facility.</p>
+        </div>
+    </div>
+</div>
+
+<style>
+    .transition-hover {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .transition-hover:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 1rem 3rem rgba(0,0,0,0.1) !important;
+    }
+</style>
 {% endblock %}

@@ -1,0 +1,29 @@
+{% extends "dashboard/dashboard_base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}Assign New Task - WMRS{% endblock %}
+
+{% block header %}Assign New Task{% endblock %}
+
+{% block dashboard_content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4">
+                <form method="post">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-success btn-lg">Assign Task</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="text-center mt-3">
+            <a href="{% url 'tasks:task_list' %}" class="text-muted text-decoration-none small">
+                <i class="bi bi-arrow-left me-1"></i> Back to Task List
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

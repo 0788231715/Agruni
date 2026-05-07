@@ -49,6 +49,14 @@ class UnpaidInvoiceListView(LoginRequiredMixin, ListView):
         managed_zones = Zone.objects.filter(manager=user)
         return queryset.filter(subscription__zone__in=managed_zones)
 
+class CustomerInvoiceListView(LoginRequiredMixin, ListView):
+    model = Invoice
+    template_name = "payments/invoice_list.html"
+    context_object_name = "invoices"
+
+    def get_queryset(self):
+        return Invoice.objects.filter(subscription__customer=self.request.user).order_by('-created_at')
+
 class ClientPaymentView(LoginRequiredMixin, CreateView):
     model = Payment
     form_class = ClientPaymentForm

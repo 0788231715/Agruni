@@ -29,7 +29,15 @@
                 {% for c in complaints %}
                 <tr>
                     <td>{{ c.created_at|date:"M d, Y" }}</td>
-                    <td><span class="fw-bold">{{ c.subject }}</span></td>
+                    <td>
+                        <span class="fw-bold">{{ c.subject }}</span>
+                        {% if c.admin_response %}
+                            <div class="mt-2 p-2 bg-light border-start border-4 border-success small">
+                                <strong class="text-success"><i class="bi bi-reply-fill"></i> Response:</strong><br>
+                                {{ c.admin_response|linebreaksbr }}
+                            </div>
+                        {% endif %}
+                    </td>
                     <td>{{ c.customer.username }}</td>
                     <td>
                         <span class="badge rounded-pill bg-{% if c.status == 'RESOLVED' %}success{% elif c.status == 'PENDING' %}warning text-dark{% else %}info{% endif %}">
@@ -38,9 +46,11 @@
                     </td>
                     <td>
                         {% if user.role == 'ADMIN' or user.role == 'GENERAL_MANAGER' %}
-                            <a href="{% url 'complaints:complaint_resolve' c.id %}" class="btn btn-sm btn-outline-primary rounded-pill px-3">Resolve</a>
+                            <a href="{% url 'complaints:complaint_resolve' c.id %}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                                {% if c.status == 'RESOLVED' %}Edit Response{% else %}Resolve{% endif %}
+                            </a>
                         {% else %}
-                            <span class="text-muted small">Viewing Only</span>
+                            <span class="text-muted small">{% if c.status == 'RESOLVED' %}Resolved{% else %}Pending{% endif %}</span>
                         {% endif %}
                     </td>
                 </tr>

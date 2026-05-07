@@ -203,14 +203,38 @@
             <i class="bi bi-speedometer2"></i><span>Overview</span>
         </a>
 
+        <a class="nav-link {% if 'tasks' in request.path and 'chat' not in request.path %}active{% endif %}" href="{% url 'tasks:task_list' %}">
+            <i class="bi bi-chat-left-text"></i>
+            <span>Tasks</span>
+            {% if user.unread_tasks_count > 0 %}
+                <span class="badge bg-danger ms-auto rounded-pill">{{ user.unread_tasks_count }}</span>
+            {% endif %}
+        </a>
+
+        {% if user.role != 'CUSTOMER' %}
+            <a class="nav-link {% if 'chat' in request.path %}active{% endif %}" href="{% url 'tasks:chat_list' %}">
+                <i class="bi bi-chat-dots"></i>
+                <span>Staff Chat</span>
+                {% if user.unread_messages_count > 0 %}
+                    <span class="badge bg-danger ms-auto rounded-pill">{{ user.unread_messages_count }}</span>
+                {% endif %}
+            </a>
+        {% endif %}
+
+        <a class="nav-link {% if 'announcements' in request.path %}active{% endif %}" href="{% url 'core:announcement_list' %}">
+            <i class="bi bi-megaphone"></i>
+            <span>Announcements</span>
+        </a>
+
         <div class="text-white-50 small text-uppercase px-3 mt-4 mb-2">Main Menu</div>
 
         {% if user.role == 'CUSTOMER' %}
             <a class="nav-link" href="{% url 'collection:request_create' %}"><i class="bi bi-calendar-event"></i><span>My Requests</span></a>
-            <a class="nav-link" href="#"><i class="bi bi-receipt"></i><span>My Invoices</span></a>
-            <a class="nav-link" href="#"><i class="bi bi-chat-dots"></i><span>Complaints</span></a>
+            <a class="nav-link" href="{% url 'payments:invoice_list' %}"><i class="bi bi-receipt"></i><span>My Invoices</span></a>
+            <a class="nav-link {% if 'complaints' in request.path %}active{% endif %}" href="{% url 'complaints:complaint_list' %}"><i class="bi bi-chat-dots"></i><span>Complaints</span></a>
 
         {% elif user.role == 'ADMIN' or user.role == 'GENERAL_MANAGER' %}
+            <a class="nav-link {% if 'complaints' in request.path %}active{% endif %}" href="{% url 'complaints:complaint_list' %}"><i class="bi bi-exclamation-octagon"></i><span>Complaints</span></a>
             <a class="nav-link {% if 'users' in request.path and 'add' not in request.path %}active{% endif %}" href="{% url 'accounts:user_list' %}"><i class="bi bi-people"></i><span>All Users</span></a>
             <a class="nav-link {% if 'subscriptions' in request.path %}active{% endif %}" href="{% url 'collection:subscription_list' %}"><i class="bi bi-file-earmark-check"></i><span>Agreements</span></a>
             <a class="nav-link {% if 'zones' in request.path %}active{% endif %}" href="{% url 'collection:zone_list' %}"><i class="bi bi-geo-alt"></i><span>Locations/Zones</span></a>
@@ -229,7 +253,7 @@
             <a class="nav-link {% if 'unpaid' in request.path %}active{% endif %}" href="{% url 'payments:unpaid_invoices' %}"><i class="bi bi-exclamation-triangle"></i><span>Unpaid Clients</span></a>
 
         {% elif user.role == 'COLLECTOR' %}
-            <a class="nav-link" href="#"><i class="bi bi-house-door"></i><span>My Customers</span></a>
+            <a class="nav-link {% if 'my-clients' in request.path %}active{% endif %}" href="{% url 'collection:my_clients' %}"><i class="bi bi-house-door"></i><span>My Customers</span></a>
             <a class="nav-link" href="{% url 'payments:record_payment' %}"><i class="bi bi-cash"></i><span>Record Payment</span></a>
             <a class="nav-link" href="{% url 'payments:create_handover' %}"><i class="bi bi-arrow-right-circle"></i><span>Money Handover</span></a>
 

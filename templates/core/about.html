@@ -1,40 +1,161 @@
 {% extends 'base.html' %}
 
-{% block title %}About Us - WMRS{% endblock %}
+{% block title %}About Us - WMRS Rwanda{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="row mb-5">
-        <div class="col-lg-6">
-            <h2 class="fw-bold mb-4">About WMRS Rwanda</h2>
-            <p class="lead">We are a leading waste management company dedicated to making Rwanda cleaner and greener.</p>
-            <p>Founded with a vision of sustainable environmental management, WMRS provides end-to-end solutions for waste collection, sorting, and recycling. Our team of professionals is committed to international standards of hygiene and environmental protection.</p>
-            <p>We work with residential complexes, commercial businesses, and industrial partners to ensure that waste is not just "thrown away," but managed as a resource.</p>
-        </div>
-        <div class="col-lg-6">
-            <img src="https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&q=80&w=2070" class="img-fluid rounded shadow" alt="About Us">
-        </div>
+<!-- Hero Section -->
+<div class="bg-dark text-white py-5 shadow-sm" style="background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&q=80&w=2070') center/cover;">
+    <div class="container py-5 text-center">
+        <h1 class="display-3 fw-bold mb-3">Pioneering Sustainability</h1>
+        <p class="lead mb-0">Transforming waste into resources for a cleaner, greener Rwanda.</p>
     </div>
+</div>
 
-    <div class="row g-4 text-center">
-        <div class="col-md-4">
-            <div class="p-4 border rounded">
-                <h3 class="text-success">5000+</h3>
-                <p class="text-muted">Happy Clients</p>
+<!-- Mission & Story -->
+<div class="container py-5 mt-5">
+    <div class="row align-items-center g-5 mb-5">
+        <div class="col-lg-6">
+            <h6 class="text-success fw-bold text-uppercase tracking-wider mb-2">Our Story</h6>
+            <h2 class="display-5 fw-bold mb-4">Leading the Way in Environmental Excellence</h2>
+            <p class="text-muted lead mb-4">Founded in Kigali, WMRS (Waste Management & Recycling System) started with a simple yet powerful mission: to revolutionize how waste is managed in urban and rural Rwanda.</p>
+            <p class="text-muted mb-4">What began as a small collection service has evolved into a comprehensive environmental solutions provider. We don't just collect waste; we manage the entire lifecycle—from smart collection and segregation to professional recycling and processing.</p>
+            <div class="row g-4 mt-2">
+                <div class="col-6">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="bg-success-subtle p-2 rounded">
+                            <i class="bi bi-check-lg text-success h4 mb-0"></i>
+                        </div>
+                        <span class="fw-bold">ISO Certified</span>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="bg-success-subtle p-2 rounded">
+                            <i class="bi bi-check-lg text-success h4 mb-0"></i>
+                        </div>
+                        <span class="fw-bold">24/7 Support</span>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="p-4 border rounded">
-                <h3 class="text-success">50+</h3>
-                <p class="text-muted">Collection Trucks</p>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="p-4 border rounded">
-                <h3 class="text-success">90%</h3>
-                <p class="text-muted">Waste Recycled</p>
+        <div class="col-lg-6">
+            <div class="position-relative">
+                <img src="https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&q=80&w=2070" class="img-fluid rounded-4 shadow-lg" alt="Team at work">
+                <div class="position-absolute bottom-0 start-0 translate-middle-x ms-5 mb-n4 d-none d-lg-block">
+                    <div class="bg-success text-white p-4 rounded-4 shadow-lg text-center" style="width: 180px;">
+                        <h2 class="fw-bold mb-0">10+</h2>
+                        <p class="small mb-0">Years Experience</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<!-- Mission, Vision, Values -->
+<div class="bg-light py-5">
+    <div class="container py-5">
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm p-4 text-center">
+                    <div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-4 mx-auto" style="width: 70px; height: 70px;">
+                        <i class="bi bi-eye-fill h3 mb-0"></i>
+                    </div>
+                    <h4 class="fw-bold">Our Vision</h4>
+                    <p class="text-muted mb-0">To be the primary catalyst for a zero-waste Rwanda, setting international benchmarks for environmental sustainability and resource recovery.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm p-4 text-center">
+                    <div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-4 mx-auto" style="width: 70px; height: 70px;">
+                        <i class="bi bi-bullseye h3 mb-0"></i>
+                    </div>
+                    <h4 class="fw-bold">Our Mission</h4>
+                    <p class="text-muted mb-0">To provide innovative, efficient, and eco-friendly waste management solutions that protect public health and preserve Rwanda's natural beauty.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm p-4 text-center">
+                    <div class="bg-success text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-4 mx-auto" style="width: 70px; height: 70px;">
+                        <i class="bi bi-heart-fill h3 mb-0"></i>
+                    </div>
+                    <h4 class="fw-bold">Core Values</h4>
+                    <p class="text-muted mb-0">Integrity, Environmental Stewardship, Operational Excellence, and Community Empowerment are at the heart of everything we do.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Impact Numbers -->
+<div class="container py-5 my-5">
+    <div class="row g-4 text-center">
+        <div class="col-md-3">
+            <h2 class="display-4 fw-bold text-success mb-2">15k+</h2>
+            <p class="text-muted fw-bold text-uppercase small">Tons Recycled</p>
+        </div>
+        <div class="col-md-3">
+            <h2 class="display-4 fw-bold text-success mb-2">5k+</h2>
+            <p class="text-muted fw-bold text-uppercase small">Active Clients</p>
+        </div>
+        <div class="col-md-3">
+            <h2 class="display-4 fw-bold text-success mb-2">120+</h2>
+            <p class="text-muted fw-bold text-uppercase small">Expert Staff</p>
+        </div>
+        <div class="col-md-3">
+            <h2 class="display-4 fw-bold text-success mb-2">30+</h2>
+            <p class="text-muted fw-bold text-uppercase small">Zones Covered</p>
+        </div>
+    </div>
+</div>
+
+<!-- Meet the Leaders -->
+<div class="bg-white py-5 border-top">
+    <div class="container py-5">
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">Meet Our Leadership</h2>
+            <div class="bg-success mx-auto mt-3" style="width: 60px; height: 3px;"></div>
+        </div>
+        <div class="row g-4 justify-content-center">
+            {% for staff in staff_members %}
+            <div class="col-md-3 text-center">
+                <div class="mb-3">
+                    {% if staff.profile_picture %}
+                        <img src="{{ staff.profile_picture.url }}" class="rounded-circle shadow" width="160" height="160" style="object-fit: cover; border: 4px solid #fff;">
+                    {% else %}
+                        <div class="bg-success-subtle d-inline-flex align-items-center justify-content-center rounded-circle shadow" style="width: 160px; height: 160px; border: 4px solid #fff;">
+                            <i class="bi bi-person-fill display-3 text-success opacity-50"></i>
+                        </div>
+                    {% endif %}
+                </div>
+                <h5 class="fw-bold mb-1">{{ staff.get_full_name|default:staff.username }}</h5>
+                <p class="text-success small fw-bold text-uppercase mb-2">{{ staff.get_role_display }}</p>
+                <div class="d-flex justify-content-center gap-2">
+                    <a href="#" class="btn btn-light btn-sm rounded-circle"><i class="bi bi-linkedin"></i></a>
+                    <a href="#" class="btn btn-light btn-sm rounded-circle"><i class="bi bi-envelope"></i></a>
+                </div>
+            </div>
+            {% empty %}
+                <p class="text-muted text-center">Leadership details available upon request.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Call to Action -->
+<div class="bg-success text-white py-5 text-center">
+    <div class="container py-4">
+        <h2 class="fw-bold mb-4">Ready to be part of the solution?</h2>
+        <p class="lead mb-5 opacity-75">Join thousands of Rwandans committed to professional waste management.</p>
+        <div class="d-flex justify-content-center gap-3">
+            <a href="{% url 'accounts:register' %}" class="btn btn-light btn-lg px-4">Register Now</a>
+            <a href="{% url 'core:contact' %}" class="btn btn-outline-light btn-lg px-4">Contact Sales</a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .tracking-wider { letter-spacing: 0.1em; }
+    .mb-n4 { margin-bottom: -1.5rem !important; }
+</style>
 {% endblock %}

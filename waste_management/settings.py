@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     "complaints",
     "reports",
     "dashboard",
+    "tasks",
 ]
 
 MIDDLEWARE = [
@@ -62,6 +63,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "accounts.middleware.UserActivityMiddleware",
 ]
 
 ROOT_URLCONF = "waste_management.urls"

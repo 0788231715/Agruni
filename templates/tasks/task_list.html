@@ -1,0 +1,102 @@
+{% extends "dashboard/dashboard_base.html" %}
+
+{% block title %}Tasks & Communication - WMRS{% endblock %}
+
+{% block header %}Tasks & Communication{% endblock %}
+
+{% block dashboard_content %}
+<div class="row">
+    <!-- Received Tasks -->
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0 fw-bold text-success">My Tasks</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4">Status</th>
+                                <th>Task</th>
+                                <th>From</th>
+                                <th>Assigned</th>
+                                <th class="text-end pe-4">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for task in received_tasks %}
+                                <tr class="{% if not task.is_read %}bg-light-subtle{% endif %}">
+                                    <td class="ps-4">
+                                        {% if task.status == 'PENDING' %}
+                                            <span class="badge bg-warning">Pending</span>
+                                        {% elif task.status == 'IN_PROGRESS' %}
+                                            <span class="badge bg-info">In Progress</span>
+                                        {% else %}
+                                            <span class="badge bg-success">Completed</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="fw-bold">{{ task.title }}</div>
+                                        {% if not task.is_read %}
+                                            <span class="badge bg-danger rounded-pill x-small">New</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ task.creator.username }}</td>
+                                    <td>{{ task.created_at|date:"M d, H:i" }}</td>
+                                    <td class="text-end pe-4">
+                                        <a href="{% url 'tasks:task_detail' task.pk %}" class="btn btn-sm btn-outline-primary">
+                                            View
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center py-5 text-muted">No tasks assigned to you.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sidebar: Create & Sent -->
+    <div class="col-lg-4">
+        {% if user.role != 'CUSTOMER' %}
+        <div class="d-grid mb-4">
+            <a href="{% url 'tasks:task_create' %}" class="btn btn-success btn-lg">
+                <i class="bi bi-plus-circle me-2"></i> Create Task
+            </a>
+        </div>
+        {% endif %}
+
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0 fw-bold text-success">Tasks I Assigned</h5>
+            </div>
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush">
+                    {% for task in created_tasks %}
+                        <li class="list-group-item p-3 border-bottom">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="fw-bold small">{{ task.assignee.username }}</span>
+                                <span class="badge {% if task.is_read %}bg-success-subtle text-success{% else %}bg-secondary-subtle text-secondary{% endif %} x-small">
+                                    {% if task.is_read %}Seen{% else %}Unseen{% endif %}
+                                </span>
+                            </div>
+                            <div class="small text-truncate">{{ task.title }}</div>
+                            <div class="x-small text-muted mt-1">
+                                Status: {{ task.get_status_display }}
+                            </div>
+                        </li>
+                    {% empty %}
+                        <li class="list-group-item text-center py-4 text-muted">You haven't assigned any tasks.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -3,37 +3,126 @@
 {% block title %}Contact Us - WMRS{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card p-5 shadow-sm border-0">
-                <h2 class="text-center fw-bold mb-4">Get In Touch</h2>
-                <p class="text-center text-muted mb-5">Have a question or need a custom quote? Fill out the form below and we'll get back to you within 24 hours.</p>
-                
-                <form action="#" method="post">
-                    {% csrf_token %}
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label class="form-label">Full Name</label>
-                            <input type="text" class="form-control" placeholder="John Doe">
+<div class="bg-light py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h1 class="fw-bold text-success">Get In Touch</h1>
+            <p class="text-muted lead">We are here to help you manage your waste more efficiently.</p>
+        </div>
+
+        <!-- Contact Channels -->
+        <div class="row g-4 mb-5 text-center">
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm p-4">
+                    <div class="display-6 text-success mb-3">
+                        <i class="bi bi-headset"></i>
+                    </div>
+                    <h5 class="fw-bold">Customer Support</h5>
+                    <p class="text-muted small">For inquiries about our services, pricing, or account issues.</p>
+                    <p class="text-success fw-bold mb-0">+250 788 123 456</p>
+                    <p class="text-muted small">support@wmrs.rw</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm p-4">
+                    <div class="display-6 text-success mb-3">
+                        <i class="bi bi-truck"></i>
+                    </div>
+                    <h5 class="fw-bold">Logistics & Pickup</h5>
+                    <p class="text-muted small">To schedule a special collection or report a missed pickup.</p>
+                    <p class="text-success fw-bold mb-0">+250 788 654 321</p>
+                    <p class="text-muted small">logistics@wmrs.rw</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm p-4">
+                    <div class="display-6 text-success mb-3">
+                        <i class="bi bi-bank"></i>
+                    </div>
+                    <h5 class="fw-bold">Finance Office</h5>
+                    <p class="text-muted small">For billing inquiries, payment verifications, and invoices.</p>
+                    <p class="text-success fw-bold mb-0">+250 788 999 000</p>
+                    <p class="text-muted small">finance@wmrs.rw</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-5">
+            <!-- Contact Form -->
+            <div class="col-lg-7">
+                <div class="card p-4 p-md-5 shadow-sm border-0">
+                    <h3 class="fw-bold mb-4">Send us a Message</h3>
+                    <form action="#" method="post">
+                        {% csrf_token %}
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Full Name</label>
+                                <input type="text" class="form-control" placeholder="John Doe">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Email Address</label>
+                                <input type="email" class="form-control" placeholder="john@example.com">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Subject</label>
+                                <select class="form-select">
+                                    <option selected>General Inquiry</option>
+                                    <option>Missed Collection</option>
+                                    <option>Billing Question</option>
+                                    <option>Business Partnership</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Message</label>
+                                <textarea class="form-control" rows="5" placeholder="Describe your request..."></textarea>
+                            </div>
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-success btn-lg w-100">Send Message</button>
+                            </div>
                         </div>
-                        <div class="col-md-6">
-                            <label class="form-label">Email Address</label>
-                            <input type="email" class="form-control" placeholder="john@example.com">
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label">Subject</label>
-                            <input type="text" class="form-control" placeholder="Service Inquiry">
-                        </div>
-                        <div class="col-12">
-                            <label class="form-label">Message</label>
-                            <textarea class="form-control" rows="5" placeholder="How can we help you?"></textarea>
-                        </div>
-                        <div class="col-12">
-                            <button type="submit" class="btn btn-success btn-lg w-100">Send Message</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Key Staff Details -->
+            <div class="col-lg-5">
+                <h3 class="fw-bold mb-4">Our Key Staff</h3>
+                <div class="d-flex flex-column gap-3">
+                    {% for staff in staff_members %}
+                    <div class="card border-0 shadow-sm overflow-hidden">
+                        <div class="d-flex align-items-center">
+                            <div class="bg-{% cycle 'success' 'secondary' 'info' 'primary' %} text-white p-4 text-center" style="width: 100px;">
+                                {% if staff.profile_picture %}
+                                    <img src="{{ staff.profile_picture.url }}" class="rounded-circle" width="50" height="50" style="object-fit: cover;">
+                                {% else %}
+                                    <i class="bi bi-person-fill display-6"></i>
+                                {% endif %}
+                            </div>
+                            <div class="p-3">
+                                <h6 class="fw-bold mb-0">{{ staff.get_full_name|default:staff.username }}</h6>
+                                <p class="text-muted small mb-1">{{ staff.get_role_display }}</p>
+                                <p class="mb-0 small"><i class="bi bi-telephone text-success me-2"></i>{{ staff.phone_number|default:"+250 788 000 000" }}</p>
+                            </div>
                         </div>
                     </div>
-                </form>
+                    {% empty %}
+                        <p class="text-muted">Staff details currently unavailable.</p>
+                    {% endfor %}
+                </div>
+
+                <div class="mt-5 p-4 bg-white rounded shadow-sm border-start border-4 border-success">
+                    <h5 class="fw-bold"><i class="bi bi-clock me-2 text-success"></i>Office Hours</h5>
+                    <ul class="list-unstyled mb-0 mt-3">
+                        <li class="d-flex justify-content-between mb-2">
+                            <span>Monday - Friday</span>
+                            <span class="fw-bold">08:00 - 18:00</span>
+                        </li>
+                        <li class="d-flex justify-content-between">
+                            <span>Saturday</span>
+                            <span class="fw-bold">09:00 - 13:00</span>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
     </div>
