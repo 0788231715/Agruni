@@ -69,3 +69,22 @@ class UserUpdateForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ["first_name", "last_name", "email", "phone_number", "address", "latitude", "longitude", "profile_picture"]
+
+class ProfilePictureUpdateForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ["profile_picture"]
+        widgets = {
+            'profile_picture': forms.FileInput(attrs={'class': 'form-control'})
+        }
+
+class LimitedUserUpdateForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ["first_name", "last_name", "phone_number", "profile_picture"]
+        widgets = {
+            'first_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'phone_number': forms.TextInput(attrs={'class': 'form-control'}),
+            'profile_picture': forms.FileInput(attrs={'class': 'form-control'}),
+        }

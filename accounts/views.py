@@ -1,5 +1,5 @@
-from django.shortcuts import render, redirect
-from django.views.generic import CreateView, UpdateView, ListView
+from django.shortcuts import render, redirect, get_object_or_404
+from django.views.generic import CreateView, UpdateView, ListView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.http import JsonResponse
@@ -7,8 +7,12 @@ from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db.models import Q, Count
 from django.contrib import messages
-from .forms import DashboardUserRegistrationForm, UserRegistrationForm, UserUpdateForm, ProfileUpdateForm, RegistrationRequestForm
-from .models import User, Profile, RegistrationRequest
+from .forms import (
+    DashboardUserRegistrationForm, UserRegistrationForm, UserUpdateForm, 
+    ProfileUpdateForm, RegistrationRequestForm, ProfilePictureUpdateForm,
+    LimitedUserUpdateForm
+)
+from .models import User, Profile, RegistrationRequest, ProfileUpdateRequest
 
 class StaffRequiredMixin(UserPassesTestMixin):
     def test_func(self):
@@ -145,35 +149,69 @@ class RegisterView(CreateView):
     template_name = "registration/register.html"
     success_url = reverse_lazy("login")
 
-class ProfileView(LoginRequiredMixin, UpdateView):
+class ProfileView(LoginRequiredMixin, DetailView):
     model = User
-    form_class = UserUpdateForm
     template_name = "accounts/profile.html"
-    success_url = reverse_lazy("accounts:profile")
+    context_object_name = "profile_user"
 
     def get_object(self):
         return self.request.user
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if hasattr(self.request.user, "profile"):
-            context["profile_form"] = ProfileUpdateForm(instance=self.request.user.profile)
-        else:
-            context["profile_form"] = ProfileUpdateForm()
+        # Check if user has an APPROVED request that is not yet COMPLETED
+        context["approved_request"] = ProfileUpdateRequest.objects.filter(
+            user=self.request.user, 
+            status=ProfileUpdateRequest.Status.APPROVED
+        ).first()
         return context
 
-    def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        user_form = UserUpdateForm(request.POST, request.FILES, instance=self.object)
-        profile_form = ProfileUpdateForm(request.POST, request.FILES, instance=self.object.profile if hasattr(self.object, "profile") else None)
+class ActualProfileUpdateView(LoginRequiredMixin, UpdateView):
+    model = User
+    form_class = LimitedUserUpdateForm
+    template_name = "accounts/edit_profile.html"
+    success_url = reverse_lazy("accounts:profile")
+
+    def get_object(self):
+        return self.request.user
+
+    def get(self, request, *args, **kwargs):
+        # Only allow if an APPROVED request exists
+        if not ProfileUpdateRequest.objects.filter(user=request.user, status=ProfileUpdateRequest.Status.APPROVED).exists():
+            messages.error(request, "You do not have an approved profile update session.")
+            return redirect("accounts:profile")
+        return super().get(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        # Save changes
+        response = super().form_valid(form)
         
-        if user_form.is_valid() and profile_form.is_valid():
-            user_form.save()
-            profile = profile_form.save(commit=False)
-            profile.user = self.object
-            profile.save()
-            return redirect(self.success_url)
-        return self.render_to_response(self.get_context_data(form=user_form, profile_form=profile_form))
+        # Mark request as COMPLETED
+        req = ProfileUpdateRequest.objects.filter(
+            user=self.request.user, 
+            status=ProfileUpdateRequest.Status.APPROVED
+        ).first()
+        if req:
+            req.status = ProfileUpdateRequest.Status.COMPLETED
+            req.save()
+            
+            # Notify Admin that user has finished update
+            admin_user = User.objects.filter(role=User.Role.ADMIN, is_active=True).first()
+            if not admin_user:
+                admin_user = User.objects.filter(is_staff=True, is_active=True).first()
+            
+            if admin_user:
+                from tasks.models import Task
+                Task.objects.create(
+                    creator=self.request.user,
+                    assignee=admin_user,
+                    title=f"Update Finished: {self.request.user.username}",
+                    description=f"User {self.request.user.username} has finished updating their profile following your approval.",
+                    status=Task.TaskStatus.COMPLETED
+                )
+        
+        messages.success(self.request, "Profile updated successfully. Your edit session is now closed.")
+        return response
 
 class UserToggleActiveView(LoginRequiredMixin, UserPassesTestMixin, View):
     def test_func(self):
@@ -186,3 +224,85 @@ class UserToggleActiveView(LoginRequiredMixin, UserPassesTestMixin, View):
         status = "enabled" if user.is_active else "disabled"
         messages.success(request, f"User {user.username} has been {status}.")
         return redirect("accounts:user_list")
+
+class ProfilePictureUpdateView(LoginRequiredMixin, UpdateView):
+    model = User
+    form_class = ProfilePictureUpdateForm
+    template_name = "accounts/profile.html"
+    success_url = reverse_lazy("accounts:profile")
+
+    def get_object(self):
+        return self.request.user
+
+    def form_valid(self, form):
+        messages.success(self.request, "Profile picture updated successfully.")
+        return super().form_valid(form)
+
+class RequestProfileUpdateView(LoginRequiredMixin, View):
+    def post(self, request):
+        details = request.POST.get("details")
+        if not details:
+            messages.error(request, "Please provide the details of your requested changes.")
+            return redirect("accounts:profile")
+        
+        # Create the formal request
+        ProfileUpdateRequest.objects.create(
+            user=request.user,
+            requested_changes=details,
+            status=ProfileUpdateRequest.Status.PENDING
+        )
+        
+        # Also create a task for the Admin to notify them
+        admin_user = User.objects.filter(role=User.Role.ADMIN, is_active=True).first()
+        if not admin_user:
+            admin_user = User.objects.filter(is_staff=True, is_active=True).first()
+        
+        if admin_user:
+            from tasks.models import Task
+            Task.objects.create(
+                creator=request.user,
+                assignee=admin_user,
+                title=f"New Profile Update Request: {request.user.username}",
+                description=f"User {request.user.username} has submitted a new profile update request. Please review it in the Management section.\n\nDetails: {details}",
+                status=Task.TaskStatus.PENDING
+            )
+            
+        messages.success(request, "Your change request has been sent for review. An administrator will process it soon.")
+        return redirect("accounts:profile")
+
+class ProfileUpdateRequestListView(LoginRequiredMixin, StaffRequiredMixin, ListView):
+    model = ProfileUpdateRequest
+    template_name = "accounts/profile_request_list.html"
+    context_object_name = "requests"
+    
+    def get_queryset(self):
+        return ProfileUpdateRequest.objects.all().order_by('-created_at')
+
+class HandleProfileUpdateRequestView(LoginRequiredMixin, StaffRequiredMixin, View):
+    def post(self, request, pk):
+        req = get_object_or_404(ProfileUpdateRequest, pk=pk)
+        action = request.POST.get("action")
+        admin_notes = request.POST.get("admin_notes", "")
+        
+        if action == "approve":
+            req.status = ProfileUpdateRequest.Status.APPROVED
+            messages.success(request, f"Request from {req.user.username} has been approved.")
+            # Note: Automatic applying of changes is tricky with free-form text.
+            # Usually admin would manually apply them. 
+        elif action == "reject":
+            req.status = ProfileUpdateRequest.Status.REJECTED
+            messages.success(request, f"Request from {req.user.username} has been rejected.")
+            
+        req.admin_notes = admin_notes
+        req.save()
+        
+        # Notify the user
+        from core.models import Notification
+        Notification.objects.create(
+            user=req.user,
+            title="Profile Update Status",
+            message=f"Your profile update request has been {req.status.lower()}. {f'Notes: {admin_notes}' if admin_notes else ''}",
+            link=reverse_lazy("accounts:profile")
+        )
+        
+        return redirect("accounts:profile_request_list")

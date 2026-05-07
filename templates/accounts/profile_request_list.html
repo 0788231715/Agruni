@@ -1,0 +1,107 @@
+{% extends "dashboard/dashboard_base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Profile Update Requests" %} - WMRS{% endblock %}
+{% block header %}{% trans "Management: Profile Requests" %}{% endblock %}
+
+{% block dashboard_content %}
+<div class="card shadow-sm border-0 overflow-hidden">
+    <div class="card-header bg-white py-3">
+        <h5 class="mb-0 fw-bold">{% trans "Pending Requests" %}</h5>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>{% trans "User" %}</th>
+                    <th>{% trans "Requested Changes" %}</th>
+                    <th>{% trans "Date" %}</th>
+                    <th>{% trans "Status" %}</th>
+                    <th>{% trans "Actions" %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for req in requests %}
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            {% if req.user.profile_picture %}
+                                <img src="{{ req.user.profile_picture.url }}" class="rounded-circle me-2" width="32" height="32" style="object-fit: cover;">
+                            {% else %}
+                                <i class="bi bi-person-circle fs-5 me-2 text-muted"></i>
+                            {% endif %}
+                            <div>
+                                <div class="fw-bold">{{ req.user.username }}</div>
+                                <small class="text-muted">{{ req.user.get_role_display }}</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="text-truncate" style="max-width: 300px;" title="{{ req.requested_changes }}">
+                            {{ req.requested_changes }}
+                        </div>
+                    </td>
+                    <td>{{ req.created_at|date:"M d, Y" }}</td>
+                    <td>
+                        <span class="badge bg-{% if req.status == 'PENDING' %}warning{% elif req.status == 'APPROVED' %}success{% else %}danger{% endif %}">
+                            {{ req.get_status_display }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if req.status == 'PENDING' %}
+                        <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#handleModal{{ req.id }}">
+                            {% trans "Process" %}
+                        </button>
+                        {% else %}
+                        <small class="text-muted">{{ req.admin_notes|default:"No notes" }}</small>
+                        {% endif %}
+                    </td>
+                </tr>
+
+                {% if req.status == 'PENDING' %}
+                <!-- Handle Modal -->
+                <div class="modal fade" id="handleModal{{ req.id }}" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content border-0">
+                            <div class="modal-header bg-dark text-white">
+                                <h5 class="modal-title">{% trans "Review Request" %}: {{ req.user.username }}</h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                            </div>
+                            <form method="post" action="{% url 'accounts:handle_profile_request' req.id %}">
+                                {% csrf_token %}
+                                <div class="modal-body">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">{% trans "User's Request" %}:</label>
+                                        <div class="p-3 bg-light rounded border">
+                                            {{ req.requested_changes|linebreaks }}
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">{% trans "Admin Notes" %}:</label>
+                                        <textarea name="admin_notes" class="form-control" rows="3" placeholder="Explain your decision..."></textarea>
+                                    </div>
+                                </div>
+                                <div class="modal-footer bg-light">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% trans "Close" %}</button>
+                                    <button type="submit" name="action" value="reject" class="btn btn-danger">{% trans "Reject" %}</button>
+                                    <button type="submit" name="action" value="approve" class="btn btn-success">{% trans "Approve" %}</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center py-5 text-muted">
+                        <i class="bi bi-inbox display-4 d-block mb-3"></i>
+                        {% trans "No profile update requests found." %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

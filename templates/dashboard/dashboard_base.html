@@ -1,9 +1,10 @@
+{% load i18n %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ LANGUAGE_CODE }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Dashboard - WMRS{% endblock %}</title>
+    <title>{% block title %}{% trans "Dashboard" %} - WMRS{% endblock %}</title>
 
     <!-- CSS Dependencies -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -199,13 +200,17 @@
     </div>
 
     <div class="sidebar-nav">
+        <a class="nav-link" href="{% url 'core:home' %}">
+            <i class="bi bi-house-door"></i><span>{% trans "Home Page" %}</span>
+        </a>
+
         <a class="nav-link {% if request.resolver_match.url_name == 'index' %}active{% endif %}" href="{% url 'dashboard:index' %}">
-            <i class="bi bi-speedometer2"></i><span>Overview</span>
+            <i class="bi bi-speedometer2"></i><span>{% trans "Overview" %}</span>
         </a>
 
         <a class="nav-link {% if 'tasks' in request.path and 'chat' not in request.path %}active{% endif %}" href="{% url 'tasks:task_list' %}">
             <i class="bi bi-chat-left-text"></i>
-            <span>Tasks</span>
+            <span>{% trans "Tasks" %}</span>
             {% if user.unread_tasks_count > 0 %}
                 <span class="badge bg-danger ms-auto rounded-pill">{{ user.unread_tasks_count }}</span>
             {% endif %}
@@ -214,7 +219,7 @@
         {% if user.role != 'CUSTOMER' %}
             <a class="nav-link {% if 'chat' in request.path %}active{% endif %}" href="{% url 'tasks:chat_list' %}">
                 <i class="bi bi-chat-dots"></i>
-                <span>Staff Chat</span>
+                <span>{% trans "Staff Chat" %}</span>
                 {% if user.unread_messages_count > 0 %}
                     <span class="badge bg-danger ms-auto rounded-pill">{{ user.unread_messages_count }}</span>
                 {% endif %}
@@ -223,72 +228,69 @@
 
         <a class="nav-link {% if 'announcements' in request.path %}active{% endif %}" href="{% url 'core:announcement_list' %}">
             <i class="bi bi-megaphone"></i>
-            <span>Announcements</span>
+            <span>{% trans "Announcements" %}</span>
         </a>
 
-        <div class="text-white-50 small text-uppercase px-3 mt-4 mb-2">Main Menu</div>
+        <div class="text-white-50 small text-uppercase px-3 mt-4 mb-2">{% trans "Main Menu" %}</div>
 
         {% if user.role == 'CUSTOMER' %}
-            <a class="nav-link" href="{% url 'collection:request_create' %}"><i class="bi bi-calendar-event"></i><span>My Requests</span></a>
-            <a class="nav-link" href="{% url 'payments:invoice_list' %}"><i class="bi bi-receipt"></i><span>My Invoices</span></a>
-            <a class="nav-link {% if 'complaints' in request.path %}active{% endif %}" href="{% url 'complaints:complaint_list' %}"><i class="bi bi-chat-dots"></i><span>Complaints</span></a>
+            <a class="nav-link" href="{% url 'collection:request_create' %}"><i class="bi bi-calendar-event"></i><span>{% trans "My Requests" %}</span></a>
+            <a class="nav-link" href="{% url 'payments:invoice_list' %}"><i class="bi bi-receipt"></i><span>{% trans "My Invoices" %}</span></a>
+            <a class="nav-link {% if 'complaints' in request.path %}active{% endif %}" href="{% url 'complaints:complaint_list' %}"><i class="bi bi-chat-dots"></i><span>{% trans "Complaints" %}</span></a>
 
         {% elif user.role == 'ADMIN' or user.role == 'GENERAL_MANAGER' %}
-            <a class="nav-link {% if 'complaints' in request.path %}active{% endif %}" href="{% url 'complaints:complaint_list' %}"><i class="bi bi-exclamation-octagon"></i><span>Complaints</span></a>
-            <a class="nav-link {% if 'users' in request.path and 'add' not in request.path %}active{% endif %}" href="{% url 'accounts:user_list' %}"><i class="bi bi-people"></i><span>All Users</span></a>
-            <a class="nav-link {% if 'subscriptions' in request.path %}active{% endif %}" href="{% url 'collection:subscription_list' %}"><i class="bi bi-file-earmark-check"></i><span>Agreements</span></a>
-            <a class="nav-link {% if 'zones' in request.path %}active{% endif %}" href="{% url 'collection:zone_list' %}"><i class="bi bi-geo-alt"></i><span>Locations/Zones</span></a>
-            <a class="nav-link {% if 'financial' in request.path %}active{% endif %}" href="{% url 'dashboard:financial_summary' %}"><i class="bi bi-cash-stack"></i><span>Financial Summary</span></a>
-            <a class="nav-link" href="{% url 'reports:financial_report' %}"><i class="bi bi-bar-chart"></i><span>Reports</span></a>
+            <a class="nav-link {% if 'complaints' in request.path %}active{% endif %}" href="{% url 'complaints:complaint_list' %}"><i class="bi bi-exclamation-octagon"></i><span>{% trans "Complaints" %}</span></a>
+            <a class="nav-link {% if 'profile/requests' in request.path %}active{% endif %}" href="{% url 'accounts:profile_request_list' %}"><i class="bi bi-person-gear"></i><span>{% trans "Profile Requests" %}</span></a>
+            <a class="nav-link {% if 'users' in request.path and 'add' not in request.path %}active{% endif %}" href="{% url 'accounts:user_list' %}"><i class="bi bi-people"></i><span>{% trans "All Users" %}</span></a>
+            <a class="nav-link {% if 'subscriptions' in request.path %}active{% endif %}" href="{% url 'collection:subscription_list' %}"><i class="bi bi-file-earmark-check"></i><span>{% trans "Agreements" %}</span></a>
+            <a class="nav-link {% if 'zones' in request.path %}active{% endif %}" href="{% url 'collection:zone_list' %}"><i class="bi bi-geo-alt"></i><span>{% trans "Locations/Zones" %}</span></a>
+            <a class="nav-link {% if 'financial' in request.path %}active{% endif %}" href="{% url 'dashboard:financial_summary' %}"><i class="bi bi-cash-stack"></i><span>{% trans "Financial Summary" %}</span></a>
+            <a class="nav-link" href="{% url 'reports:financial_report' %}"><i class="bi bi-bar-chart"></i><span>{% trans "Reports" %}</span></a>
 
         {% elif user.role == 'SECRETARY' %}
-            <a class="nav-link {% if 'register-user' in request.path %}active{% endif %}" href="{% url 'accounts:register_user' %}"><i class="bi bi-person-plus"></i><span>Register Customer</span></a>
-            <a class="nav-link {% if 'subscriptions/create' in request.path %}active{% endif %}" href="{% url 'collection:subscription_create' %}"><i class="bi bi-file-earmark-text"></i><span>Agreements</span></a>
-            <a class="nav-link {% if 'users' in request.path and 'role=CUSTOMER' in request.get_full_path %}active{% endif %}" href="{% url 'accounts:user_list' %}?role=CUSTOMER"><i class="bi bi-card-list"></i><span>Customer List</span></a>
-            <a class="nav-link {% if 'zones' in request.path %}active{% endif %}" href="{% url 'collection:zone_list' %}"><i class="bi bi-geo-alt"></i><span>View Zones</span></a>
+            <a class="nav-link {% if 'register-user' in request.path %}active{% endif %}" href="{% url 'accounts:register_user' %}"><i class="bi bi-person-plus"></i><span>{% trans "Register Customer" %}</span></a>
+            <a class="nav-link {% if 'subscriptions/create' in request.path %}active{% endif %}" href="{% url 'collection:subscription_create' %}"><i class="bi bi-file-earmark-text"></i><span>{% trans "Agreements" %}</span></a>
+            <a class="nav-link {% if 'users' in request.path and 'role=CUSTOMER' in request.get_full_path %}active{% endif %}" href="{% url 'accounts:user_list' %}?role=CUSTOMER"><i class="bi bi-card-list"></i><span>{% trans "Customer List" %}</span></a>
+            <a class="nav-link {% if 'zones' in request.path %}active{% endif %}" href="{% url 'collection:zone_list' %}"><i class="bi bi-geo-alt"></i><span>{% trans "View Zones" %}</span></a>
 
         {% elif user.role == 'LOCATION_MANAGER' %}
-            <a class="nav-link {% if 'users' in request.path %}active{% endif %}" href="{% url 'accounts:user_list' %}?role=COLLECTOR"><i class="bi bi-people"></i><span>My Collectors</span></a>
-            <a class="nav-link {% if 'handover' in request.path %}active{% endif %}" href="{% url 'payments:handover_list' %}"><i class="bi bi-wallet2"></i><span>Cash Handovers</span></a>
-            <a class="nav-link {% if 'unpaid' in request.path %}active{% endif %}" href="{% url 'payments:unpaid_invoices' %}"><i class="bi bi-exclamation-triangle"></i><span>Unpaid Clients</span></a>
+            <a class="nav-link {% if 'users' in request.path %}active{% endif %}" href="{% url 'accounts:user_list' %}?role=COLLECTOR"><i class="bi bi-people"></i><span>{% trans "My Collectors" %}</span></a>
+            <a class="nav-link {% if 'handover' in request.path %}active{% endif %}" href="{% url 'payments:handover_list' %}"><i class="bi bi-wallet2"></i><span>{% trans "Cash Handovers" %}</span></a>
+            <a class="nav-link {% if 'unpaid' in request.path %}active{% endif %}" href="{% url 'payments:unpaid_invoices' %}"><i class="bi bi-exclamation-triangle"></i><span>{% trans "Unpaid Clients" %}</span></a>
 
         {% elif user.role == 'COLLECTOR' %}
-            <a class="nav-link {% if 'my-clients' in request.path %}active{% endif %}" href="{% url 'collection:my_clients' %}"><i class="bi bi-house-door"></i><span>My Customers</span></a>
-            <a class="nav-link" href="{% url 'payments:record_payment' %}"><i class="bi bi-cash"></i><span>Record Payment</span></a>
-            <a class="nav-link" href="{% url 'payments:create_handover' %}"><i class="bi bi-arrow-right-circle"></i><span>Money Handover</span></a>
+            <a class="nav-link {% if 'my-clients' in request.path %}active{% endif %}" href="{% url 'collection:my_clients' %}"><i class="bi bi-house-door"></i><span>{% trans "My Customers" %}</span></a>
+            <a class="nav-link" href="{% url 'payments:record_payment' %}"><i class="bi bi-cash"></i><span>{% trans "Record Payment" %}</span></a>
+            <a class="nav-link" href="{% url 'payments:create_handover' %}"><i class="bi bi-arrow-right-circle"></i><span>{% trans "Money Handover" %}</span></a>
 
         {% elif user.role == 'FINANCE' %}
-            <a class="nav-link" href="/admin/payments/invoice/"><i class="bi bi-receipt"></i><span>Invoices</span></a>
-            <a class="nav-link" href="{% url 'payments:unpaid_invoices' %}"><i class="bi bi-credit-card"></i><span>Verify Payments</span></a>
-            <a class="nav-link" href="{% url 'dashboard:financial_summary' %}"><i class="bi bi-graph-up"></i><span>Revenue/Profit</span></a>
+            <a class="nav-link" href="/admin/payments/invoice/"><i class="bi bi-receipt"></i><span>{% trans "Invoices" %}</span></a>
+            <a class="nav-link" href="{% url 'payments:unpaid_invoices' %}"><i class="bi bi-credit-card"></i><span>{% trans "Verify Payments" %}</span></a>
+            <a class="nav-link" href="{% url 'dashboard:financial_summary' %}"><i class="bi bi-graph-up"></i><span>{% trans "Revenue/Profit" %}</span></a>
 
         {% elif user.role == 'DRIVER' %}
-            <a class="nav-link" href="{% url 'collection:assignment_list' %}"><i class="bi bi-map"></i><span>My Route</span></a>
-            <a class="nav-link" href="{% url 'collection:assignment_list' %}"><i class="bi bi-truck"></i><span>Transport Tasks</span></a>
+            <a class="nav-link" href="{% url 'collection:assignment_list' %}"><i class="bi bi-map"></i><span>{% trans "My Route" %}</span></a>
+            <a class="nav-link" href="{% url 'collection:assignment_list' %}"><i class="bi bi-truck"></i><span>{% trans "Transport Tasks" %}</span></a>
 
         {% elif user.role == 'SUPERVISOR' %}
-            <a class="nav-link" href="{% url 'collection:request_list' %}"><i class="bi bi-calendar-check"></i><span>Dispatch</span></a>
-            <a class="nav-link" href="/admin/collection/vehicle/"><i class="bi bi-truck"></i><span>Fleet Management</span></a>
+            <a class="nav-link" href="{% url 'collection:request_list' %}"><i class="bi bi-calendar-check"></i><span>{% trans "Dispatch" %}</span></a>
+            <a class="nav-link" href="/admin/collection/vehicle/"><i class="bi bi-truck"></i><span>{% trans "Fleet Management" %}</span></a>
 
         {% elif user.role == 'SORTING_STAFF' %}
-            <a class="nav-link {% if 'records' in request.path %}active{% endif %}" href="{% url 'recycling:waste_records' %}"><i class="bi bi-recycle"></i><span>Waste Records</span></a>
-            <a class="nav-link {% if 'sorting/add' in request.path %}active{% endif %}" href="{% url 'recycling:sorting_add' %}"><i class="bi bi-clipboard-data"></i><span>Processing</span></a>
+            <a class="nav-link {% if 'records' in request.path %}active{% endif %}" href="{% url 'recycling:waste_records' %}"><i class="bi bi-recycle"></i><span>{% trans "Waste Records" %}</span></a>
+            <a class="nav-link {% if 'sorting/add' in request.path %}active{% endif %}" href="{% url 'recycling:sorting_add' %}"><i class="bi bi-clipboard-data"></i><span>{% trans "Processing" %}</span></a>
         {% endif %}
 
-        <div class="text-white-50 small text-uppercase px-3 mt-4 mb-2">Account</div>
+        <div class="text-white-50 small text-uppercase px-3 mt-4 mb-2">{% trans "Account" %}</div>
 
         <a class="nav-link" href="{% url 'accounts:profile' %}">
-            <i class="bi bi-gear"></i><span>Settings</span>
-        </a>
-
-        <a class="nav-link" href="{% url 'core:home' %}">
-            <i class="bi bi-house"></i><span>Back to Web</span>
+            <i class="bi bi-gear"></i><span>{% trans "Settings" %}</span>
         </a>
 
         <form action="{% url 'logout' %}" method="post" class="logout-form">
             {% csrf_token %}
             <button type="submit" class="nav-link">
-                <i class="bi bi-box-arrow-right"></i><span>Logout</span>
+                <i class="bi bi-box-arrow-right"></i><span>{% trans "Logout" %}</span>
             </button>
         </form>
     </div>
@@ -296,7 +298,7 @@
 
 <div id="content">
     <button class="btn btn-success mobile-sidebar-toggle mb-3" id="sidebarToggle" type="button">
-        <i class="bi bi-list me-2"></i> Menu
+        <i class="bi bi-list me-2"></i> {% trans "Menu" %}
     </button>
 
     <div class="d-flex justify-content-between align-items-center dashboard-header">
@@ -307,12 +309,32 @@
                     <li class="breadcrumb-item">
                         <a href="/" class="text-success text-decoration-none">WMRS</a>
                     </li>
-                    <li class="breadcrumb-item active">Dashboard</li>
+                    <li class="breadcrumb-item active">{% trans "Dashboard" %}</li>
                 </ol>
             </nav>
         </div>
 
         <div class="d-flex align-items-center gap-3">
+            <div class="dropdown">
+                <button class="btn btn-white bg-white shadow-sm border-0 p-2" type="button" data-bs-toggle="dropdown">
+                    <i class="bi bi-translate fs-5"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                    <li>
+                        <form action="{% url 'set_language' %}" method="post">
+                            {% csrf_token %}
+                            <input name="next" type="hidden" value="{{ request.get_full_path }}">
+                            <button name="language" value="en" class="dropdown-item {% if LANGUAGE_CODE == 'en' %}active{% endif %}">English</button>
+                            <button name="language" value="rw" class="dropdown-item {% if LANGUAGE_CODE == 'rw' %}active{% endif %}">Kinyarwanda</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+
+            <a href="{% url 'core:home' %}" class="btn btn-outline-success shadow-sm d-none d-md-inline-flex align-items-center me-2">
+                <i class="bi bi-house-door me-2"></i> {% trans "Home Page" %}
+            </a>
+
             <div class="dropdown">
                 <button class="btn btn-white bg-white shadow-sm border-0 position-relative p-2" type="button" data-bs-toggle="dropdown" id="notificationDropdown">
                     <i class="bi bi-bell fs-5"></i>
@@ -323,8 +345,8 @@
 
                 <ul class="dropdown-menu dropdown-menu-end shadow border-0 p-0 overflow-hidden" style="min-width:320px;">
                     <li class="p-3 border-bottom bg-light d-flex justify-content-between align-items-center">
-                        <h6 class="mb-0 text-success fw-bold">Notifications</h6>
-                        <button class="btn btn-link p-0 small text-decoration-none" onclick="markAllAsRead()">Mark all as read</button>
+                        <h6 class="mb-0 text-success fw-bold">{% trans "Notifications" %}</h6>
+                        <button class="btn btn-link p-0 small text-decoration-none" onclick="markAllAsRead()">{% trans "Mark all as read" %}</button>
                     </li>
 
                     <div style="max-height:350px; overflow-y:auto;" id="notificationList">
@@ -342,14 +364,14 @@
                                         <div class="d-flex justify-content-between align-items-center mt-1">
                                             <small class="x-small text-muted">{{ note.created_at|timesince }} ago</small>
                                             {% if not note.is_read %}
-                                                <button class="btn btn-link p-0 x-small text-decoration-none mark-read-btn" onclick="markRead({{ note.id }}, event)">Mark read</button>
+                                                <button class="btn btn-link p-0 x-small text-decoration-none mark-read-btn" onclick="markRead({{ note.id }}, event)">{% trans "Mark read" %}</button>
                                             {% endif %}
                                         </div>
                                     </div>
                                 </a>
                             </li>
                         {% empty %}
-                            <li class="p-4 text-center text-muted">No new notifications</li>
+                            <li class="p-4 text-center text-muted">{% trans "No new notifications" %}</li>
                         {% endfor %}
                     </div>
                 </ul>

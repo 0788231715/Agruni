@@ -1,0 +1,271 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2024-05-07 12:00+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: rw\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Waste Management & Recycling"
+msgstr "Gucunga no Gutunganya Imyanda"
+
+msgid "Home"
+msgstr "Ahabanza"
+
+msgid "About"
+msgstr "Ibitwerekeye"
+
+msgid "Services"
+msgstr "Serivisi"
+
+msgid "Projects"
+msgstr "Imishinga"
+
+msgid "Contact"
+msgstr "Twandikire"
+
+msgid "Dashboard"
+msgstr "Imbonerahamwe"
+
+msgid "Logout"
+msgstr "Sohoka"
+
+msgid "Login"
+msgstr "Injira"
+
+msgid "Sign Up"
+msgstr "Kwiyandikisha"
+
+msgid "Leading the way in sustainable waste management and recycling solutions."
+msgstr "Turi imbere mu gucunga imyanda mu buryo burambye no kuyitunganya."
+
+msgid "Quick Links"
+msgstr "Ihuza Rikoreshwa Cyane"
+
+msgid "Terms of Service"
+msgstr "Amategeko n'Amabwiriza"
+
+msgid "Privacy Policy"
+msgstr "Ibijyanye n'Ibwiru"
+
+msgid "Careers"
+msgstr "Akazi"
+
+msgid "Contact Us"
+msgstr "Twandikire"
+
+msgid "All rights reserved."
+msgstr "Uburenganzira bwose burasubitswe."
+
+msgid "Home Page"
+msgstr "Ahabanza"
+
+msgid "Overview"
+msgstr "Incamake"
+
+msgid "Tasks"
+msgstr "Imirimo"
+
+msgid "Staff Chat"
+msgstr "Kuganira n'Abakozi"
+
+msgid "Announcements"
+msgstr "Amatangazo"
+
+msgid "Main Menu"
+msgstr "Ibikubiyemo"
+
+msgid "My Requests"
+msgstr "Ibisabwa byanjye"
+
+msgid "My Invoices"
+msgstr "Inyemezabwishyu"
+
+msgid "Complaints"
+msgstr "Imyitwarire mibi"
+
+msgid "All Users"
+msgstr "Abakoresha bose"
+
+msgid "Agreements"
+msgstr "Amasezerano"
+
+msgid "Locations/Zones"
+msgstr "Ahantu/Uturere"
+
+msgid "Financial Summary"
+msgstr "Incamake y'Imari"
+
+msgid "Reports"
+msgstr "Raporo"
+
+msgid "Register Customer"
+msgstr "Andika Umukiliya"
+
+msgid "Customer List"
+msgstr "Urutonde rw'Abakiliya"
+
+msgid "View Zones"
+msgstr "Reba Uturere"
+
+msgid "My Collectors"
+msgstr "Abakusanya myanda"
+
+msgid "Cash Handovers"
+msgstr "Ihererekanya ry'Amafaranga"
+
+msgid "Unpaid Clients"
+msgstr "Abakiliya batishuye"
+
+msgid "My Customers"
+msgstr "Abakiliya banjye"
+
+msgid "Record Payment"
+msgstr "Andika Ubwishyu"
+
+msgid "Money Handover"
+msgstr "Ihererekanya ry'Amafaranga"
+
+msgid "Invoices"
+msgstr "Inyemezabwishyu"
+
+msgid "Verify Payments"
+msgstr "Genbacka Ubwishyu"
+
+msgid "Revenue/Profit"
+msgstr "Inyungu"
+
+msgid "My Route"
+msgstr "Inzira yanjye"
+
+msgid "Transport Tasks"
+msgstr "Imirimo yo Gutwara"
+
+msgid "Dispatch"
+msgstr "Kohereza"
+
+msgid "Fleet Management"
+msgstr "Gucunga Ibinyabiziga"
+
+msgid "Waste Records"
+msgstr "Ibishyizwe mu bitabo by'Imyanda"
+
+msgid "Processing"
+msgstr "Gutunganya"
+
+msgid "Account"
+msgstr "Konti"
+
+msgid "Settings"
+msgstr "Igenamiterere"
+
+msgid "Menu"
+msgstr "Ibikubiyemo"
+
+msgid "Notifications"
+msgstr "Imenyekanisha"
+
+msgid "Mark all as read"
+msgstr "fata nkaho byose ko byasomwe"
+
+msgid "Mark read"
+msgstr "hitamo ko byasomwe"
+
+msgid "No new notifications"
+msgstr "Nta menyekanisha rishya"
+
+msgid "Profile Update Requests"
+msgstr "Ibisabwa byo guhindura imyirondoro"
+
+msgid "Management: Profile Requests"
+msgstr "Ubuyobozi: Ibisabwa byo guhindura imyirondoro"
+
+msgid "Pending Requests"
+msgstr "Ibisabwa bitegereje"
+
+msgid "User"
+msgstr "Ukoresha"
+
+msgid "Requested Changes"
+msgstr "Ibihinduka bisabwa"
+
+msgid "Date"
+msgstr "Itariki"
+
+msgid "Status"
+msgstr "Imiterere"
+
+msgid "Actions"
+msgstr "Ibikorwa"
+
+msgid "Process"
+msgstr "Kora kuri ibi"
+
+msgid "Review Request"
+msgstr "Soma ibisabwa"
+
+msgid "User's Request"
+msgstr "Ibyo ukoresha asaba"
+
+msgid "Admin Notes"
+msgstr "Ibyanditswe n'ubuyobozi"
+
+msgid "Close"
+msgstr "Funga"
+
+msgid "Reject"
+msgstr "Mwihakane"
+
+msgid "Approve"
+msgstr "Byemeze"
+
+msgid "No profile update requests found."
+msgstr "Nta bisabwa byo guhindura imyirondoro byabonetse."
+
+msgid "Profile Requests"
+msgstr "Ibisabwa ku myirondoro"
+
+msgid "Edit Profile Now"
+msgstr "Hindura imyirondoro yawe nonaha"
+
+msgid "Edit Profile"
+msgstr "Guhindura imyirondoro"
+
+msgid "Secure Profile Update"
+msgstr "Guhindura imyirondoro mu buryo bwizewe"
+
+msgid "Approved Edit Session"
+msgstr "Guhindura byemewe"
+
+msgid "Your request has been approved. You can now update your names, phone number, and photo. Region and address changes remain restricted."
+msgstr "Ibisabwa byanyu byemejwe. Ushobora guhindura amazina yawe, nimero ya terefone, n'ifoto. Agace n'aho utuye ntibyemewe guhindurwa."
+
+msgid "First Name"
+msgstr "Izina ry'ikigenzi"
+
+msgid "Last Name"
+msgstr "Izina ry'umuryango"
+
+msgid "Phone Number"
+msgstr "Nimero ya terefone"
+
+msgid "Profile Picture"
+msgstr "Ifoto y'imyirondoro"
+
+msgid "Upload a professional photo for your identification."
+msgstr "Shyiraho ifoto igaragaza neza uwo uri we."
+
+msgid "Cancel"
+msgstr "Kureka"
+
+msgid "Save & Close Session"
+msgstr "Bika hanyuma ufunge"
+
+msgid "Note: Saving these changes will end your current edit session."
+msgstr "Icyitonderwa: Kubika ibi bizahita bafunga uburyo bwo guhindura imyirondoro."
