@@ -56,6 +56,19 @@
                         </div>
                     </div>
 
+                    <div class="row bg-light p-3 rounded mb-3 mx-0">
+                        <div class="col-12 mb-2">
+                            <h6 class="fw-bold mb-1 small text-success"><i class="bi bi-geo-alt-fill me-1"></i>Location Pinning (Optional)</h6>
+                            <p class="x-small text-muted mb-2">Provide coordinates to show this user on the dashboard map.</p>
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            {{ form.latitude|as_crispy_field }}
+                        </div>
+                        <div class="col-md-6 mb-2">
+                            {{ form.longitude|as_crispy_field }}
+                        </div>
+                    </div>
+
                     <div class="row bg-light p-3 rounded mb-4 mx-0">
                         <div class="col-md-6">
                             {{ form.is_active|as_crispy_field }}

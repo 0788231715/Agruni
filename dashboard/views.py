@@ -6,7 +6,7 @@ from collection.models import ServiceRequest, DriverAssignment, Vehicle, Pickup,
 from recycling.models import WasteSorting
 from payments.models import Invoice, Payment, Expense, MoneyHandover, SalaryOrCommission
 from complaints.models import Complaint
-from django.db.models import Sum, Count
+from django.db.models import Sum, Count, Q
 from django.contrib import messages
 from django.urls import reverse_lazy
 from .forms import DashboardUserCreationForm
@@ -157,9 +157,18 @@ class DashboardIndexView(LoginRequiredMixin, TemplateView):
         return render(request, "dashboard/collector_dashboard.html", context)
 
     def customer_dashboard(self, request):
+        unpaid_invoices = Invoice.objects.filter(
+            Q(subscription__customer=request.user) | Q(request__customer=request.user),
+            status=Invoice.InvoiceStatus.UNPAID
+        ).order_by('due_date')
+        
         context = {
             "my_requests": ServiceRequest.objects.filter(customer=request.user).order_by('-created_at')[:5],
-            "my_invoices": Invoice.objects.filter(request__customer=request.user).order_by('-created_at')[:5],
+            "my_invoices": Invoice.objects.filter(
+                Q(subscription__customer=request.user) | Q(request__customer=request.user)
+            ).order_by('-created_at')[:5],
+            "unpaid_invoices": unpaid_invoices,
+            "my_subscriptions": Subscription.objects.filter(customer=request.user, is_active=True),
             "my_complaints": Complaint.objects.filter(customer=request.user).order_by('-created_at')[:5],
         }
         return render(request, "dashboard/customer_dashboard.html", context)

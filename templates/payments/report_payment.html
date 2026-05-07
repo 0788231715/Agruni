@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Report Payment - WMRS{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow border-0 overflow-hidden">
+                <div class="bg-success p-4 text-white text-center">
+                    <h3>Report Your Payment</h3>
+                    <p class="mb-0">Follow the steps below to pay and notify us.</p>
+                </div>
+                <div class="card-body p-4">
+                    <div class="alert alert-info border-0 shadow-sm mb-4">
+                        <h5 class="alert-heading"><i class="bi bi-info-circle-fill me-2"></i>Payment Instructions</h5>
+                        <ol class="mb-0 mt-2">
+                            <li>Dial <strong>*182#</strong> on your phone (MTN MoMo).</li>
+                            <li>Select <strong>Pay Bill</strong> or <strong>Send Money</strong>.</li>
+                            <li>Enter Merchant/Phone Number: <strong>078XXXXXXX</strong> (Agruni WMRS).</li>
+                            <li>Enter the amount and your PIN.</li>
+                            <li>Copy the <strong>Transaction ID</strong> from the SMS and submit it below.</li>
+                        </ol>
+                    </div>
+
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form.amount|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form.payment_method|as_crispy_field }}
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            {{ form.transaction_id|as_crispy_field }}
+                        </div>
+                        <div class="mb-3">
+                            {{ form.proof_image|as_crispy_field }}
+                        </div>
+                        
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-success btn-lg">Submit Payment Report</button>
+                            <a href="{% url 'dashboard:index' %}" class="btn btn-light">Back to Dashboard</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

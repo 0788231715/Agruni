@@ -5,7 +5,11 @@ from django.core.exceptions import ValidationError
 class RegistrationRequestForm(forms.ModelForm):
     class Meta:
         model = RegistrationRequest
-        fields = ["full_name", "email", "phone_number", "address", "customer_type"]
+        fields = ["full_name", "email", "phone_number", "address", "customer_type", "latitude", "longitude"]
+        widgets = {
+            'latitude': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Optional: Latitude'}),
+            'longitude': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Optional: Longitude'}),
+        }
 
 class DashboardUserRegistrationForm(forms.ModelForm):
     password = forms.CharField(
@@ -20,7 +24,7 @@ class DashboardUserRegistrationForm(forms.ModelForm):
         model = User
         fields = [
             'username', 'first_name', 'last_name', 'email', 
-            'phone_number', 'role', 'address', 'is_active', 'is_verified'
+            'phone_number', 'role', 'address', 'latitude', 'longitude', 'is_active', 'is_verified'
         ]
         widgets = {
             'username': forms.TextInput(attrs={'class': 'form-control'}),
@@ -30,6 +34,8 @@ class DashboardUserRegistrationForm(forms.ModelForm):
             'phone_number': forms.TextInput(attrs={'class': 'form-control'}),
             'role': forms.Select(attrs={'class': 'form-select'}),
             'address': forms.Textarea(attrs={'class': 'form-control', 'rows': 2}),
+            'latitude': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Optional: Latitude'}),
+            'longitude': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Optional: Longitude'}),
             'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
             'is_verified': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
         }
@@ -52,7 +58,7 @@ class UserRegistrationForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput)
     class Meta:
         model = User
-        fields = ["username", "email", "phone_number", "role"]
+        fields = ["username", "email", "phone_number", "role", "latitude", "longitude"]
 
 class ProfileUpdateForm(forms.ModelForm):
     class Meta:

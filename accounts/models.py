@@ -99,6 +99,8 @@ class RegistrationRequest(models.Model):
     phone_number = models.CharField(max_length=15)
     address = models.TextField()
     customer_type = models.CharField(max_length=50)
+    latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
     created_at = models.DateTimeField(auto_now_add=True)
 

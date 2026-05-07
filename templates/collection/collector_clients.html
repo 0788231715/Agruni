@@ -65,9 +65,19 @@
                             {% endif %}
                         </td>
                         <td class="text-center">
-                            <a href="{% url 'collection:subscription_detail' sub.pk %}" class="btn btn-sm btn-outline-success">
-                                <i class="bi bi-eye"></i>
-                            </a>
+                            <div class="btn-group">
+                                <a href="{% url 'collection:subscription_detail' sub.pk %}" class="btn btn-sm btn-outline-success" title="View Detail">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                {% if sub.latest_invoice and sub.latest_invoice.status != 'PAID' %}
+                                <form action="{% url 'payments:notify_payment' sub.pk %}" method="post" class="d-inline ms-1">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-sm btn-outline-primary" title="Send Payment Notification">
+                                        <i class="bi bi-bell-fill"></i>
+                                    </button>
+                                </form>
+                                {% endif %}
+                            </div>
                         </td>
                     </tr>
                     {% empty %}

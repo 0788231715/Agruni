@@ -3,13 +3,14 @@ from django.views.generic import CreateView, ListView, UpdateView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from .models import Payment, Invoice, MoneyHandover, Expense
-from .forms import PaymentForm, MoneyHandoverForm, ExpenseForm, ClientPaymentForm
+from .forms import PaymentForm, MoneyHandoverForm, ExpenseForm, ClientPaymentForm, ReportPaymentForm
 from django.utils import timezone
 from django.views import View
 from django.http import JsonResponse
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from core.models import Notification
+from collection.models import Subscription, Zone
 
 User = get_user_model()
 
@@ -26,7 +27,6 @@ class MoneyHandoverListView(LoginRequiredMixin, ListView):
             return MoneyHandover.objects.all().order_by('-created_at')
         
         # Location Managers see handovers to them OR in their zones
-        from collection.models import Zone
         managed_zones = Zone.objects.filter(manager=user)
         return MoneyHandover.objects.filter(
             Q(to_user=user) | Q(zone__in=managed_zones)
@@ -45,7 +45,6 @@ class UnpaidInvoiceListView(LoginRequiredMixin, ListView):
             return queryset
         
         # Location Managers see unpaid clients in their zones
-        from collection.models import Zone
         managed_zones = Zone.objects.filter(manager=user)
         return queryset.filter(subscription__zone__in=managed_zones)
 
@@ -93,6 +92,66 @@ class ClientPaymentView(LoginRequiredMixin, CreateView):
         )
         return response
 
+class NotifyPaymentView(LoginRequiredMixin, View):
+    def post(self, request, pk):
+        subscription = get_object_or_404(Subscription, id=pk, collector=request.user)
+        latest_invoice = subscription.invoices.filter(status=Invoice.InvoiceStatus.UNPAID).first()
+        
+        if not latest_invoice:
+            # If no unpaid invoice, maybe create one based on agreed fee?
+            # For now, let's just notify if there is an invoice.
+            messages.warning(request, f"No unpaid invoice found for {subscription.customer.username}.")
+            return redirect("collection:collector_clients")
+
+        Notification.objects.create(
+            user=subscription.customer,
+            title="Payment Request",
+            message=f"Your collector {request.user.username} has requested payment for your waste collection service. Please pay RWF {latest_invoice.amount} to our mobile money number: 078XXXXXXX.",
+            link=f"{reverse_lazy('payments:client_pay')}?invoice={latest_invoice.id}"
+        )
+        messages.success(request, f"Payment notification sent to {subscription.customer.username}.")
+        return redirect("collection:collector_clients")
+
+class ReportPaymentView(LoginRequiredMixin, CreateView):
+    model = Payment
+    form_class = ReportPaymentForm
+    template_name = "payments/report_payment.html"
+    success_url = reverse_lazy("dashboard:index")
+
+    def form_valid(self, form):
+        # Find active subscription for this customer
+        subscription = Subscription.objects.filter(customer=self.request.user, is_active=True).first()
+        
+        if not subscription:
+            messages.error(self.request, "You do not have an active subscription to pay for.")
+            return redirect("dashboard:index")
+
+        # Create Invoice
+        import uuid
+        invoice = Invoice.objects.create(
+            subscription=subscription,
+            invoice_number=f"INV-{uuid.uuid4().hex[:8].upper()}",
+            amount=form.cleaned_data['amount'],
+            due_date=timezone.now().date(),
+            status=Invoice.InvoiceStatus.PAID
+        )
+
+        form.instance.invoice = invoice
+        form.instance.is_verified = False # Needs verification by finance
+        response = super().form_valid(form)
+        
+        # Notify Finance
+        targets = User.objects.filter(role__in=["ADMIN", "FINANCE"])
+        for target in targets:
+            Notification.objects.create(
+                user=target,
+                title="Payment Reported",
+                message=f"Customer {self.request.user.username} reported a payment of RWF {form.instance.amount}. Please verify."
+            )
+        
+        messages.success(self.request, "Payment reported successfully. An invoice has been generated and your payment is pending verification.")
+        return response
+
 class MarkNotificationReadView(LoginRequiredMixin, View):
     def post(self, request, pk):
         note = get_object_or_404(Notification, id=pk, user=request.user)
@@ -116,7 +175,8 @@ class AnnouncePaymentDueView(LoginRequiredMixin, View):
             Notification.objects.create(
                 user=inv.subscription.customer,
                 title="Payment Due Reminder",
-                message=f"Friendly reminder: Your invoice #{inv.invoice_number} for RWF {inv.amount} is due on {inv.due_date}."
+                message=f"Friendly reminder: Your invoice #{inv.invoice_number} for RWF {inv.amount} is due on {inv.due_date}.",
+                link=f"{reverse_lazy('payments:client_pay')}?invoice={inv.id}"
             )
         messages.success(request, "Payment reminders sent to all unpaid clients.")
         return redirect("dashboard:index")

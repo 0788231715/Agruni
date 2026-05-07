@@ -13,7 +13,7 @@ class ProfileAdmin(admin.ModelAdmin):
 
 @admin.register(RegistrationRequest)
 class RegistrationRequestAdmin(admin.ModelAdmin):
-    list_display = ("full_name", "email", "phone_number", "customer_type", "status", "created_at")
+    list_display = ("full_name", "email", "phone_number", "customer_type", "latitude", "longitude", "status", "created_at")
     list_filter = ("status", "customer_type")
     actions = ["approve_request"]
 

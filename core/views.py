@@ -33,7 +33,8 @@ class AnnouncementCreateView(LoginRequiredMixin, CreateView):
                 Notification.objects.create(
                     user_id=client_id,
                     title=f"Important Announcement: {announcement.title}",
-                    message=f"From your Collector {self.request.user.username}: {announcement.message}"
+                    message=f"From your Collector {self.request.user.username}: {announcement.message}",
+                    link=reverse_lazy("payments:invoice_list")
                 )
         return super().form_valid(form)
 
