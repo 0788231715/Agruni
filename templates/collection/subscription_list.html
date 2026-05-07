@@ -1,0 +1,73 @@
+{% extends "dashboard/dashboard_base.html" %}
+
+{% block title %}Service Agreements - WMRS{% endblock %}
+
+{% block header %}Service Agreements{% endblock %}
+
+{% block dashboard_content %}
+<div class="card shadow-sm border-0">
+    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 fw-bold text-success">Active Agreements</h5>
+        {% if user.role == 'SECRETARY' or user.role == 'ADMIN' %}
+            <a href="{% url 'collection:subscription_create' %}" class="btn btn-success btn-sm">
+                <i class="bi bi-plus-lg me-1"></i> New Agreement
+            </a>
+        {% endif %}
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="ps-4">ID</th>
+                        <th>Customer</th>
+                        <th>Service</th>
+                        <th>Zone</th>
+                        <th>Frequency</th>
+                        <th>Fee</th>
+                        <th>Status</th>
+                        <th class="text-end pe-4">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for sub in subscriptions %}
+                        <tr>
+                            <td class="ps-4 text-muted small">#{{ sub.id }}</td>
+                            <td>
+                                <div class="fw-bold">{{ sub.customer.username }}</div>
+                                <div class="small text-muted">{{ sub.get_customer_type_display }}</div>
+                            </td>
+                            <td><span class="badge bg-info-subtle text-info px-2">{{ sub.service.name }}</span></td>
+                            <td>{{ sub.zone.name|default:"-" }}</td>
+                            <td>{{ sub.get_frequency_display }}</td>
+                            <td class="fw-bold text-success">RWF {{ sub.agreed_fee }}</td>
+                            <td>
+                                {% if sub.is_active %}
+                                    <span class="badge bg-success-subtle text-success">Active</span>
+                                {% else %}
+                                    <span class="badge bg-danger-subtle text-danger">Inactive</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end pe-4">
+                                <a href="{% url 'collection:subscription_detail' sub.pk %}" class="btn btn-sm btn-outline-primary me-1">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a href="{% url 'collection:subscription_download' sub.pk %}" class="btn btn-sm btn-outline-success">
+                                    <i class="bi bi-download"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="8" class="text-center py-5 text-muted">
+                                <i class="bi bi-file-earmark-text display-4 mb-3 d-block"></i>
+                                No service agreements found.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

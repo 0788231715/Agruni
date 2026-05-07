@@ -12,9 +12,14 @@ class ServiceRequestForm(forms.ModelForm):
         }
 
 class SubscriptionForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        from accounts.models import User
+        self.fields['customer'].queryset = User.objects.filter(role=User.Role.CUSTOMER)
+
     class Meta:
         model = Subscription
-        fields = ["customer_type", "service", "zone", "frequency", "agreed_fee", "start_date", "end_date"]
+        fields = ["customer", "customer_type", "service", "zone", "frequency", "agreed_fee", "start_date", "end_date"]
         widgets = {
             'start_date': forms.DateInput(attrs={'type': 'date'}),
             'end_date': forms.DateInput(attrs={'type': 'date'}),

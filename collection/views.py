@@ -83,7 +83,29 @@ class SubscriptionCreateView(LoginRequiredMixin, CreateView):
 
     def form_valid(self, form):
         # Secretary usually registers for a customer
+        messages.success(self.request, "Service agreement created successfully.")
         return super().form_valid(form)
+
+class SubscriptionListView(LoginRequiredMixin, ListView):
+    model = Subscription
+    template_name = "collection/subscription_list.html"
+    context_object_name = "subscriptions"
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.role in ["ADMIN", "GENERAL_MANAGER", "SECRETARY"]:
+            return Subscription.objects.all().order_by('-created_at')
+        return Subscription.objects.filter(customer=user).order_by('-created_at')
+
+class SubscriptionDetailView(LoginRequiredMixin, DetailView):
+    model = Subscription
+    template_name = "collection/subscription_detail.html"
+    context_object_name = "subscription"
+
+class SubscriptionDownloadView(LoginRequiredMixin, DetailView):
+    model = Subscription
+    template_name = "collection/subscription_print.html"
+    context_object_name = "subscription"
 
 class ServiceRequestCreateView(LoginRequiredMixin, CreateView):
     model = ServiceRequest

@@ -1,8 +1,30 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from accounts.models import User, RegistrationRequest
-from collection.models import ServiceRequest, DriverAssignment
+from collection.models import ServiceRequest, DriverAssignment, Subscription
 from core.models import Notification
+
+@receiver(post_save, sender=Subscription)
+def notify_new_subscription(sender, instance, created, **kwargs):
+    if created:
+        # Notify Admin
+        admins = User.objects.filter(role=User.Role.ADMIN)
+        from django.urls import reverse
+        sub_url = reverse('collection:subscription_detail', kwargs={'pk': instance.pk})
+        for admin in admins:
+            Notification.objects.create(
+                user=admin,
+                title="New Service Agreement",
+                message=f"A new agreement has been created for {instance.customer.username} in {instance.zone.name if instance.zone else 'No Zone'}.",
+                link=sub_url
+            )
+        # Notify Customer
+        Notification.objects.create(
+            user=instance.customer,
+            title="Service Agreement Active",
+            message=f"Your waste management agreement is now active. Frequency: {instance.get_frequency_display()}.",
+            link=sub_url
+        )
 
 @receiver(post_save, sender=User)
 def notify_new_user(sender, instance, created, **kwargs):

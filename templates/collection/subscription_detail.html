@@ -1,0 +1,86 @@
+{% extends "dashboard/dashboard_base.html" %}
+
+{% block title %}Agreement Details - WMRS{% endblock %}
+
+{% block header %}Service Agreement #{{ subscription.id }}{% endblock %}
+
+{% block dashboard_content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold text-success">Agreement Information</h5>
+                <div>
+                    <a href="{% url 'collection:subscription_download' subscription.pk %}" class="btn btn-outline-success btn-sm">
+                        <i class="bi bi-download me-1"></i> Download Agreement
+                    </a>
+                </div>
+            </div>
+            <div class="card-body p-4">
+                <div class="row mb-4">
+                    <div class="col-sm-4 text-muted">Customer Name</div>
+                    <div class="col-sm-8 fw-bold">{{ subscription.customer.get_full_name|default:subscription.customer.username }}</div>
+                </div>
+                <div class="row mb-4">
+                    <div class="col-sm-4 text-muted">Customer Type</div>
+                    <div class="col-sm-8">{{ subscription.get_customer_type_display }}</div>
+                </div>
+                <div class="row mb-4">
+                    <div class="col-sm-4 text-muted">Service Subscribed</div>
+                    <div class="col-sm-8"><span class="badge bg-info-subtle text-info px-3">{{ subscription.service.name }}</span></div>
+                </div>
+                <div class="row mb-4">
+                    <div class="col-sm-4 text-muted">Location / Zone</div>
+                    <div class="col-sm-8">{{ subscription.zone.name|default:"Not Assigned" }}</div>
+                </div>
+                <div class="row mb-4">
+                    <div class="col-sm-4 text-muted">Collection Frequency</div>
+                    <div class="col-sm-8">{{ subscription.get_frequency_display }}</div>
+                </div>
+                <div class="row mb-4">
+                    <div class="col-sm-4 text-muted">Monthly Agreed Fee</div>
+                    <div class="col-sm-8 text-success fw-bold">RWF {{ subscription.agreed_fee }}</div>
+                </div>
+                <div class="row mb-4">
+                    <div class="col-sm-4 text-muted">Duration</div>
+                    <div class="col-sm-8">
+                        {{ subscription.start_date }} to {{ subscription.end_date|default:"Ongoing" }}
+                    </div>
+                </div>
+                <div class="row mb-0">
+                    <div class="col-sm-4 text-muted">Status</div>
+                    <div class="col-sm-8">
+                        {% if subscription.is_active %}
+                            <span class="badge bg-success">Active</span>
+                        {% else %}
+                            <span class="badge bg-danger">Inactive</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0 fw-bold text-success">Assigned Collector</h5>
+            </div>
+            <div class="card-body text-center p-4">
+                {% if subscription.collector %}
+                    <div class="mb-3">
+                        <i class="bi bi-person-badge display-4 text-success-subtle"></i>
+                    </div>
+                    <h6 class="fw-bold mb-1">{{ subscription.collector.get_full_name|default:subscription.collector.username }}</h6>
+                    <p class="text-muted small mb-0">{{ subscription.collector.phone_number|default:"No phone provided" }}</p>
+                {% else %}
+                    <div class="py-3">
+                        <i class="bi bi-person-dash display-4 text-muted"></i>
+                        <p class="text-muted mt-2">No collector assigned yet.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

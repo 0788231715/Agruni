@@ -3,8 +3,15 @@ from django.views.generic import CreateView, ListView, UpdateView, DetailView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from .models import Payment, Invoice, MoneyHandover, Expense
-from .forms import PaymentForm, MoneyHandoverForm, ExpenseForm
+from .forms import PaymentForm, MoneyHandoverForm, ExpenseForm, ClientPaymentForm
 from django.utils import timezone
+from django.views import View
+from django.http import JsonResponse
+from django.contrib import messages
+from django.contrib.auth import get_user_model
+from core.models import Notification
+
+User = get_user_model()
 
 from django.db.models import Q, Sum
 
@@ -83,6 +90,11 @@ class MarkNotificationReadView(LoginRequiredMixin, View):
         note = get_object_or_404(Notification, id=pk, user=request.user)
         note.is_read = True
         note.save()
+        return JsonResponse({"status": "success"})
+
+class MarkAllNotificationsReadView(LoginRequiredMixin, View):
+    def post(self, request):
+        Notification.objects.filter(user=request.user, is_read=False).update(is_read=True)
         return JsonResponse({"status": "success"})
 
 class AnnouncePaymentDueView(LoginRequiredMixin, View):
