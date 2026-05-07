@@ -259,15 +259,15 @@
 
         {% elif user.role == 'FINANCE' %}
             <a class="nav-link" href="/admin/payments/invoice/"><i class="bi bi-receipt"></i><span>Invoices</span></a>
-            <a class="nav-link" href="#"><i class="bi bi-credit-card"></i><span>Verify Payments</span></a>
-            <a class="nav-link" href="#"><i class="bi bi-graph-up"></i><span>Revenue/Profit</span></a>
+            <a class="nav-link" href="{% url 'payments:unpaid_invoices' %}"><i class="bi bi-credit-card"></i><span>Verify Payments</span></a>
+            <a class="nav-link" href="{% url 'dashboard:financial_summary' %}"><i class="bi bi-graph-up"></i><span>Revenue/Profit</span></a>
 
         {% elif user.role == 'DRIVER' %}
             <a class="nav-link" href="{% url 'collection:assignment_list' %}"><i class="bi bi-map"></i><span>My Route</span></a>
-            <a class="nav-link" href="#"><i class="bi bi-truck"></i><span>Transport Tasks</span></a>
+            <a class="nav-link" href="{% url 'collection:assignment_list' %}"><i class="bi bi-truck"></i><span>Transport Tasks</span></a>
 
         {% elif user.role == 'SUPERVISOR' %}
-            <a class="nav-link" href="#"><i class="bi bi-calendar-check"></i><span>Dispatch</span></a>
+            <a class="nav-link" href="{% url 'collection:request_list' %}"><i class="bi bi-calendar-check"></i><span>Dispatch</span></a>
             <a class="nav-link" href="/admin/collection/vehicle/"><i class="bi bi-truck"></i><span>Fleet Management</span></a>
 
         {% elif user.role == 'SORTING_STAFF' %}

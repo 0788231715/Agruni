@@ -137,6 +137,17 @@ class ServiceRequestCreateView(LoginRequiredMixin, CreateView):
         form.instance.customer = self.request.user
         return super().form_valid(form)
 
+class ServiceRequestListView(LoginRequiredMixin, ListView):
+    model = ServiceRequest
+    template_name = "collection/request_list.html"
+    context_object_name = "requests"
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.role in ["ADMIN", "GENERAL_MANAGER", "SUPERVISOR"]:
+            return ServiceRequest.objects.all().order_by('-created_at')
+        return ServiceRequest.objects.filter(customer=user).order_by('-created_at')
+
 class ServiceRequestDetailView(LoginRequiredMixin, DetailView):
     model = ServiceRequest
     template_name = "collection/request_detail.html"

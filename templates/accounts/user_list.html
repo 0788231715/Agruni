@@ -170,15 +170,18 @@
                                 <i class="bi bi-three-dots-vertical"></i>
                             </button>
                             <ul class="dropdown-menu dropdown-menu-end shadow border-0 p-2">
-                                <li><a class="dropdown-item rounded py-2 small" href="#"><i class="bi bi-eye me-2"></i> View Details</a></li>
+                                <li><a class="dropdown-item rounded py-2 small" href="/admin/accounts/user/{{ u.id }}/change/"><i class="bi bi-eye me-2"></i> View Details</a></li>
                                 <li><a class="dropdown-item rounded py-2 small" href="/admin/accounts/user/{{ u.id }}/change/"><i class="bi bi-pencil me-2"></i> Edit Account</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li>
-                                    {% if u.is_active %}
-                                        <a class="dropdown-item rounded py-2 small text-danger" href="#"><i class="bi bi-person-x me-2"></i> Disable Account</a>
-                                    {% else %}
-                                        <a class="dropdown-item rounded py-2 small text-success" href="#"><i class="bi bi-person-check me-2"></i> Enable Account</a>
-                                    {% endif %}
+                                    <form action="{% url 'accounts:user_toggle_active' u.id %}" method="post">
+                                        {% csrf_token %}
+                                        {% if u.is_active %}
+                                            <button type="submit" class="dropdown-item rounded py-2 small text-danger"><i class="bi bi-person-x me-2"></i> Disable Account</button>
+                                        {% else %}
+                                            <button type="submit" class="dropdown-item rounded py-2 small text-success"><i class="bi bi-person-check me-2"></i> Enable Account</button>
+                                        {% endif %}
+                                    </form>
                                 </li>
                             </ul>
                         </div>

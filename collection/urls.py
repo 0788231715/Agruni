@@ -4,6 +4,7 @@ from . import views
 app_name = "collection"
 
 urlpatterns = [
+    path("request/", views.ServiceRequestListView.as_view(), name="request_list"),
     path("request/create/", views.ServiceRequestCreateView.as_view(), name="request_create"),
     path("request/<int:pk>/", views.ServiceRequestDetailView.as_view(), name="request_detail"),
     path("request/<int:pk>/approve/", views.ServiceRequestApproveView.as_view(), name="request_approve"),

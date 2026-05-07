@@ -174,3 +174,15 @@ class ProfileView(LoginRequiredMixin, UpdateView):
             profile.save()
             return redirect(self.success_url)
         return self.render_to_response(self.get_context_data(form=user_form, profile_form=profile_form))
+
+class UserToggleActiveView(LoginRequiredMixin, UserPassesTestMixin, View):
+    def test_func(self):
+        return self.request.user.role in ["ADMIN", "GENERAL_MANAGER"]
+
+    def post(self, request, pk):
+        user = get_object_or_404(User, pk=pk)
+        user.is_active = not user.is_active
+        user.save()
+        status = "enabled" if user.is_active else "disabled"
+        messages.success(request, f"User {user.username} has been {status}.")
+        return redirect("accounts:user_list")
